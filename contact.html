@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact</title>
+
+    <link rel="stylesheet" href="css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+<style>
+    @import url("https://fonts.googleapis.com/css2?family=poppins:wght@300;400;500;600;700;800;900$display=swap");
+    *{
+        box-sizing: border-box;
+        margin: 0;
+        border: 0;
+        font-family:"poppins",sans-serif ;
+    }
+
+    body{
+        background-color: rgb(5, 48, 48);
+        height: 100vh;
+        width: 100vw;
+    }
+   
+    section{
+        height: 70vh;
+        width: 70vw;
+        background-color: rgb(8, 103, 103);
+        border-radius: 2rem;
+        position: relative;
+        top: 5vh;
+        left: 15vw;
+        justify-content: center;
+        align-items: center;
+    }
+
+    form{
+        height: 47vh;
+        width: 47vw;
+        background-color: rgb(1, 28, 28);
+        border-radius: .5rem;
+        position: relative;
+        top: 3rem;
+        left: 10rem;
+    }
+     button{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 2rem;
+        width: 10rem;
+        border: 2px solid aqua;
+        border-radius: 1rem;
+        background-color: transparent;
+        position: absolute;
+        bottom: 10%;
+        left: 40%;
+        color: white;
+        transform: background-color 1s;
+        transition: color 1s;
+        cursor: pointer;
+     }
+     button:hover{
+        background-color: aqua;
+        box-shadow: 0 0 1.5rem aqua;
+        color: black;
+     }
+     form div{
+        position: relative;
+        top: 2.5rem;
+        left: 5rem;
+        margin-bottom: 3rem;
+     }
+
+     form div input{
+        border: none;
+        outline: none;
+        margin: none;
+        background-color: transparent;
+        border-bottom: 1px solid aqua;
+        color: white;
+        width: 16rem;
+     }
+
+     form div input:focus+label{
+        
+        position: absolute;
+        bottom: 2rem;
+     }
+     form div label{
+        color: white;
+        position: absolute;
+        right: 37.5rem;
+     }
+    
+
+     textarea{
+        height: 9rem;
+        width: 12rem;
+        border-radius: .5rem;
+        border: 1px solid aqua;
+        color: white;
+        background-color: transparent;
+        position: absolute;
+        right: 10rem;
+        top:-11.5rem;
+     }
+    .media{
+        display: flex;
+        position: relative;
+        bottom: -5rem;
+        right: -10rem;
+    }
+    .media a{
+        height: 2rem;
+        width: 8rem;
+        border-radius: 1rem;
+        border: 2px solid aqua;
+        display: flex;
+        position: relative;
+        color: black;
+        align-items: center;
+        text-decoration: none;
+        background-color:transparent;
+        margin-left: 2rem;
+        transition: color 1s;
+        background-color: aqua;
+        transition: background-color 1s;
+        transition: transform 1s;
+        animation: fadeInRight 1.4s forwards ease-in;
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    @keyframes fadeInRight{
+        to{
+            opacity: 1;
+            transform: translateX(0px);
+        }
+    }
+    .media a span{
+        margin-left: .5rem;
+    }
+    .media a:hover{
+        box-shadow: 0 0 1rem aqua;
+        transform: translateY(-1rem);
+    }
+    </style>
+</head>
+<body>
+<div class="body">
+    <nav>
+        <a href="index.html">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="about.html">
+            <i class="fas fa-user"></i>
+            <span>About Me</span>
+        </a> 
+        <a href="projects.html">
+            <i class="fas fa-briefcase"></i>
+            <span>Projects</span>
+        </a>
+        <a href="#">
+            <i class="fas fa-envelope"></i>
+            <span>Contact</span>
+        </a>
+    </nav>
+
+    <section>
+        <form action="">
+            <div class="name">
+                <input type="text" name="name" id="name">
+                <label for="name">Name</label>
+            </div>
+
+            <div class="email">
+                <input type="email" name="email" id="email">
+                <label for="email">Email</label>
+            </div>
+
+            <div class="subject">
+                <input type="text" name="subject" id="subject">
+                <label for="subject">Subject</label>
+            </div>
+
+            <div class="massage">
+                <textarea name="message" id="message" placeholder="Message..."></textarea>
+            </div>
+
+            
+                <button>
+                    Send Message
+                </button>
+            
+        </form>
+
+        <div class="media">
+            <a href="https://github.com/KumTech237">
+                <i class="fab fa-github" target="_blank" rel="noopener noreferrer"></i>
+                <span>github</span>
+            </a>
+
+            <a href="https://twitter.com/KumTech" target="_blank" rel="noopener noreferrer">
+               <i class="fab fa-twitter"></i>
+               <span>twitter</span>
+            </a>
+
+            <a href="https://facebook.com/KumTech" target="_blank" rel="noopener noreferrer">
+               <i class="fab fa-facebook"></i>
+               <span>facebook</span>
+            </a>
+
+            <a href="https://youtube.com/@kumspositivity-fh7fg?si=c9nMAbnd-Om6SwXZ" target="_blank" rel="noopener noreferrer">
+               <i class="fab fa-youtube"></i>
+               <span>youtube</span>
+            </a>
+        </div>
+    </section>
+</div>
+    
+</body>
+</html>

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>homepage</title>
+</head>
+<link rel="stylesheet" href="css/all.min.css">
+<style>
+    @import url("https://fonts.googleapis.com/css2?family=poppins:wght@300;400;500;600;700;800;900$display=swap");
+    *{
+        box-sizing: border-box;
+        margin: 0;
+        border: 0;
+        font-family:"poppins",sans-serif ;
+    }
+
+    body{
+        background-color: rgb(5, 48, 48);
+    }
+
+
+    .all{
+        display: flex;
+        position: absolute;
+        top: 18%;
+        left: 13%;
+        align-content: center;
+        justify-content: space-between;
+        right: 8%;
+        background-color: rgb(2, 5, 8);
+        box-shadow: 0 0 5rem rgb(7, 245, 221);
+        border-radius: 2rem;
+
+    }
+    /* Initial styles */
+.all {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 50px;
+    overflow: hidden;
+}
+
+/* Animate each element */
+.animate {
+    opacity: 0;
+    transform: translateY(50px);
+    animation: fadeInUp 0.2s forwards;
+    background-color: blueviolet;
+}
+
+/* Staggered timing for elements */
+.animate:nth-child(1) {
+    animation-delay: 0.1s;
+}
+.animate:nth-child(2) {
+    animation-delay: 0.2s;
+}
+.animate:nth-child(3) {
+    animation-delay: 0.3s;
+}
+.animate:nth-child(4) {
+    animation-delay: 0.4s;
+}
+.animate button {
+    animation-delay: 0.5s;
+}
+
+.media a {
+    background-color: rgb(46, 18, 121);
+    opacity: 0;
+    transform: translateY(50px);
+    animation: fadeInUp 0.5s forwards;
+}
+
+.media a:nth-child(1) {
+    animation-delay: 0.6s;
+}
+.media a:nth-child(2) {
+    animation-delay:0.7s;
+}
+.media a:nth-child(3) {
+    animation-delay: 0.8s;
+}
+.media a:nth-child(4) {
+    animation-delay: 0.9s;
+}
+
+/* Image animation */
+.img {
+    opacity: 0;
+    transform: translateX(100px);
+    animation: slideInRight 1s ease-out 0.7s forwards;
+}
+
+/* Keyframes */
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+    .info{
+        width: 40%;
+        background-color: brown;
+    }
+
+    .img{
+        height: 25vw;
+        width: 25vw;
+        position: relative;
+        background: linear-gradient(rgb(8, 59, 83), rgb(13, 100, 100), rgb(17, 173, 173), aqua);
+        border-radius: 50%;
+        border: 4px solid aqua;
+        box-shadow: 0 0 2rem aqua;
+        display: flex;
+        justify-content: center;
+        left: -4rem;
+        overflow: hidden;
+        transition: transform 1s;
+    }
+   
+    .img:hover{
+        transform: translateY(-10px);
+        box-shadow: 0 0 3rem aqua;
+    }
+    img{
+        position: absolute;
+        display: block;
+        width: 500%;
+        object-fit: cover;
+        top: -40rem;
+        right: -57.5rem;
+        
+    }
+
+    h3{
+        color: white;
+        font-weight: bold;
+        margin-top: 10px;
+        font-size: 24px;
+
+    }
+
+    h1{
+        color: white;
+        font-weight: bolder;
+        color: aqua;
+        margin-top: 10px;
+        font-size: 40px;
+        text-shadow: 0 0 5px rgb(18, 241, 241);
+    }
+
+    p{
+        color: white;
+        font-weight: 500;
+        font-size: 18px;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        line-height: 25px;
+    }
+
+    button{
+        border: 2px solid aqua;
+        height: 2.4rem;
+        width: 10rem;
+        border-radius: 1.2rem;
+        color: rgb(252, 246, 246);
+        margin-right: 20px;
+        font-weight: bold;
+        font-size: 14px;
+        margin-top: 30px;
+        background: transparent;
+        transition: background-color 5s;
+        transition: color 1s;
+        transition: transform 1s;
+       
+    }
+
+    button:hover{
+        background-color: rgb(20, 207, 207);
+        color: black;
+        transform: translateY(-5px);
+        box-shadow: 0 0 1.5rem aqua;
+    }
+
+    .media{
+        position: relative;
+        display: flex;
+        bottom: 1.5rem;
+        left: 15rem;
+        justify-content: center;
+        align-items: center;
+        
+    }
+
+    .media a{
+        text-decoration: none;
+       margin-right: 10px;
+       margin-left: 10px;
+       border-radius: 1rem;
+       height: 2rem;
+       width: 7rem;
+       display: flex;
+       position: relative;
+       justify-content: center;
+       align-items: center;
+       border: 2px solid aqua;
+       transition: transform 1s;
+    }
+    .media a:hover{
+        transform: translateY(-10px);
+        box-shadow: 0 0 15px aqua;
+        color: black;
+
+    }
+    .media i{
+        color: aqua;
+        
+    }
+    span{
+        color: rgb(250, 246, 246);
+        opacity: 0.7;
+        padding: 3px 10px;
+        font-size: 15.5px;
+        font-weight: 300;
+        position: relative;
+       
+    }
+
+    nav{
+        border: 2px solid rgb(19, 20, 20);
+        background-color: rgb(19, 20, 20) ;
+        height: 3.8rem;
+        width: 30%;
+        display: flex;
+        border-radius: 1.9rem;
+        position: fixed;
+        bottom: 8%;
+        left: 35%;
+        justify-content: center;
+        align-items: center;
+    }
+
+    nav a:nth-child(1){
+        text-decoration: none;
+        color: rgb(16, 219, 246);
+        position: relative;
+        right: -20px;
+        display: flex;
+       margin-left: 10x;
+       margin-right: 10x;
+       align-items: center;
+       height: 2rem;
+       width: 7rem;
+       border-radius: 1rem;
+       box-shadow: 0 0 10px aqua;
+    }
+
+    nav a:nth-child(2){
+        text-decoration: none;
+        color: rgb(254, 255, 255);
+        position: relative;
+        right: -20px;
+        display: flex;
+       margin-left: 10x;
+       margin-right: 10x;
+       align-items: center;
+       height: 2rem;
+       width: 7rem;
+       border-radius: 1rem;
+      
+    }
+
+    nav a:nth-child(3){
+        text-decoration: none;
+        color: rgb(254, 255, 255);
+        position: relative;
+        right: -20px;
+        display: flex;
+       margin-left: 10x;
+       margin-right: 10x;
+       align-items: center;
+       height: 2rem;
+       width: 7rem;
+       border-radius: 1rem;
+      
+    }
+
+    nav a:nth-child(4){
+        text-decoration: none;
+        color: rgb(254, 255, 255);
+        position: relative;
+        right: -20px;
+        display: flex;
+       margin-left: 10x;
+       margin-right: 10x;
+       align-items: center;
+       height: 2rem;
+       width: 7rem;
+       border-radius: 1rem;
+      
+    }
+
+    nav a:hover{
+        color: aqua;      
+    }
+   
+
+    /* Entrance animation */
+nav a {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: navFadeIn 0.6s ease-out forwards;
+}
+
+/* Stagger effect */
+nav a:nth-child(1) { animation-delay: 0.3s; }
+nav a:nth-child(2) { animation-delay: 0.5s; }
+nav a:nth-child(3) { animation-delay: 0.7s; }
+nav a:nth-child(4) { animation-delay: 0.9s; }
+
+/* Hover effect */
+/*nav a:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}*/
+
+/* Keyframe */
+@keyframes navFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+    .animate{
+        opacity: 0;
+        animation: appear 3s forwards;
+    }
+
+    @keyframes appear{
+        from{
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to{
+            opacity: 1;
+            transform: translateY(0px);
+        }
+    }
+</style>
+<body>
+
+<div class="all">
+   <div class="info">
+       <h3 class="animate">
+          Hello I'm
+       </h3>
+
+       <h1 class="animate">
+          Geh<br> Fabris Kum
+       </h1>
+
+       <h3 class="animate">
+           Graphic Designer and Frontend Developer
+       </h3>
+
+       <p class="animate">
+    
+           I'm a passionate Graphic Designer and Frontend Developer with a keen eye for detail and a love for clean, creative design. I build visually appealing and user-friendly websites using modern web technologies. I enjoy turning complex problems into simple, beautiful solutions.
+        </p>
+        <a href="images/timetable.pdf" download="images/timetable.pdf"  target="_blank" rel="noopener noreferrer">
+           <button class="animate">
+               Download CV
+           </button>
+        </a>
+        <div class="media">
+           <a href="https://github.com/KumTech237">
+                <i class="fab fa-github" target="_blank" rel="noopener noreferrer"></i>
+                <span>github</span>
+            </a>
+
+            <a href="https://twitter.com/KumTech" target="_blank" rel="noopener noreferrer">
+               <i class="fab fa-twitter"></i>
+               <span>twitter</span>
+            </a>
+
+            <a href="https://facebook.com/KumTech" target="_blank" rel="noopener noreferrer">
+               <i class="fab fa-facebook"></i>
+               <span>facebook</span>
+            </a>
+
+            <a href="https://youtube.com/@kumspositivity-fh7fg?si=c9nMAbnd-Om6SwXZ" target="_blank" rel="noopener noreferrer">
+               <i class="fab fa-youtube"></i>
+               <span>youtube</span>
+            </a>
+        </div>
+    </div>
+    <div class="img">
+        <img src="images/home.png" alt="the image with suit">
+    </div>
+</div>
+
+<nav>
+    <a href="#">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+    </a>
+    <a href="about.html">
+        <i class="fas fa-user"></i>
+        <span>About Me</span>
+    </a> 
+    <a href="projects.html">
+        <i class="fas fa-briefcase"></i>
+        <span>Projects</span>
+    </a>
+    <a href="contact.html">
+        <i class="fas fa-envelope"></i>
+        <span>Contact</span>
+    </a>
+</nav>
+</body>
+</html>
