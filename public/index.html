@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FurniAR | AR Viewer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/webxr/ARButton.js"></script>
+    <style>
+        #ar-button { display: none; }
+        canvas { position: fixed; top: 0; left: 0; }
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3b7ad9;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #error-message {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem;
+            background: #ff4444;
+            color: white;
+            text-align: center;
+            z-index: 101;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Error Message -->
+    <div id="error-message"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loading">
+        <div class="spinner mb-4"></div>
+        <p class="text-gray-700 font-medium">Loading 3D model...</p>
+    </div>
+
+    <!-- AR Interface -->
+    <div id="ar-ui" class="hidden fixed bottom-4 left-0 right-0 flex justify-center gap-4">
+        <button id="rotate-btn" class="bg-white p-3 rounded-full shadow-lg">
+            <i class="fas fa-redo text-blue-600"></i>
+        </button>
+        <button id="place-btn" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-lg">
+            Tap to Place
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-ui" class="min-h-screen flex flex-col">
+        <header class="p-6 flex justify-between items-center">
+            <div class="text-2xl font-bold text-blue-600">FurniAR</div>
+            <a href="shop.html" class="text-blue-600 font-medium">Shop →</a>
+        </header>
+        <main class="flex-1 flex flex-col items-center justify-center text-center p-8">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">AR Furniture Viewer</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mb-10">
+                View your selected furniture in your space
+            </p>
+            <button id="enter-ar" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full text-lg font-semibold flex items-center gap-2 transition transform hover:-translate-y-1 shadow-lg hover:shadow-xl">
+                <i class="fas fa-cube"></i>
+                Start AR Experience
+            </button>
+            <div id="ar-button"></div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configuration - Using reliable model sources
+            const MODELS = {
+                sofa: 'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models/2.0/Box/glTF/Box.gltf',
+                table: 'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models/2.0/Suzanne/glTF/Suzanne.gltf',
+                bookshelf: 'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models/2.0/Box/glTF/Box.gltf',
+                chair: 'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models/2.0/Box/glTF/Box.gltf'
+            };
+
+            // DOM Elements
+            const elements = {
+                mainUI: document.getElementById('main-ui'),
+                loading: document.getElementById('loading'),
+                enterAR: document.getElementById('enter-ar'),
+                arUI: document.getElementById('ar-ui'),
+                arButton: document.getElementById('ar-button'),
+                errorMessage: document.getElementById('error-message'),
+                placeBtn: document.getElementById('place-btn'),
+                rotateBtn: document.getElementById('rotate-btn')
+            };
+
+            // Verify critical elements exist
+            if (!elements.mainUI || !elements.loading || !elements.enterAR || 
+                !elements.arUI || !elements.arButton || !elements.errorMessage) {
+                console.error('Missing required elements:', elements);
+                return;
+            }
+
+            let scene, camera, renderer, controller, model;
+            let canPlace = true;
+
+            // Initialize AR when coming from shop with model parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('model')) {
+                initAR();
+            }
+
+            // Event listeners with null checks
+            elements.enterAR.addEventListener('click', initAR);
+            if (elements.rotateBtn) elements.rotateBtn.addEventListener('click', rotateModel);
+            if (elements.placeBtn) elements.placeBtn.addEventListener('click', togglePlacement);
+
+            async function initAR() {
+                try {
+                    elements.mainUI.classList.add('hidden');
+                    elements.loading.style.display = 'flex';
+                    
+                    // 1. Create Scene
+                    scene = new THREE.Scene();
+                    
+                    // 2. Initialize Camera
+                    camera = new THREE.PerspectiveCamera(
+                        70, 
+                        window.innerWidth / window.innerHeight, 
+                        0.1, 
+                        1000
+                    );
+                    
+                    // 3. Set up Renderer
+                    renderer = new THREE.WebGLRenderer({ 
+                        antialias: true, 
+                        alpha: true 
+                    });
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                    renderer.setPixelRatio(window.devicePixelRatio);
+                    document.body.appendChild(renderer.domElement);
+                    
+                    // 4. Load model
+                    const modelParam = urlParams.get('model') || 'sofa';
+                    await loadModel(modelParam);
+                    
+                    // 5. Set up XR
+                    if (!await setupXR()) {
+                        showError("AR not available on this device");
+                        return;
+                    }
+                    
+                    elements.arUI.classList.remove('hidden');
+                    elements.loading.style.display = 'none';
+                    
+                } catch (error) {
+                    console.error("AR init failed:", error);
+                    showError("Failed to initialize AR. Please try again.");
+                    elements.loading.style.display = 'none';
+                }
+            }
+
+            async function setupXR() {
+                if (!navigator.xr) {
+                    showError("WebXR not supported in your browser");
+                    return false;
+                }
+                
+                try {
+                    renderer.xr.enabled = true;
+                    
+                    const arButton = ARButton.createButton(renderer, {
+                        requiredFeatures: ['hit-test'],
+                        optionalFeatures: ['dom-overlay'],
+                        domOverlay: { root: document.body }
+                    });
+                    elements.arButton.appendChild(arButton);
+                    
+                    controller = renderer.xr.getController(0);
+                    controller.addEventListener('select', onSelect);
+                    scene.add(controller);
+                    
+                    renderer.setAnimationLoop(() => {
+                        if (!renderer.xr.isPresenting) return;
+                        renderer.render(scene, camera);
+                    });
+                    
+                    return true;
+                } catch (error) {
+                    console.error("XR setup failed:", error);
+                    return false;
+                }
+            }
+
+            async function loadModel(modelKey) {
+                return new Promise((resolve) => {
+                    const loader = new THREE.GLTFLoader();
+                    const modelUrl = MODELS[modelKey] || MODELS.sofa;
+                    
+                    loader.load(modelUrl, 
+                        (gltf) => {
+                            if (model) scene.remove(model);
+                            model = gltf.scene;
+                            model.scale.set(0.5, 0.5, 0.5);
+                            model.visible = false;
+                            scene.add(model);
+                            resolve();
+                        },
+                        undefined,
+                        (error) => {
+                            console.error("Model load failed:", error);
+                            loadFallbackModel();
+                            resolve();
+                        }
+                    );
+                });
+            }
+
+            function loadFallbackModel() {
+                const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+                const material = new THREE.MeshBasicMaterial({ color: 0x3b7ad9 });
+                model = new THREE.Mesh(geometry, material);
+                model.visible = false;
+                scene.add(model);
+            }
+
+            function onSelect() {
+                if (canPlace && model) {
+                    model.position.set(0, 0, -1).applyMatrix4(controller.matrixWorld);
+                    model.visible = true;
+                    canPlace = false;
+                    elements.placeBtn.textContent = 'Rotate Mode';
+                }
+            }
+
+            function rotateModel() {
+                if (model && !canPlace) {
+                    model.rotation.y += 0.5;
+                }
+            }
+
+            function togglePlacement() {
+                canPlace = !canPlace;
+                elements.placeBtn.textContent = canPlace ? 'Tap to Place' : 'Rotate Mode';
+            }
+
+            function showError(message) {
+                elements.errorMessage.textContent = message;
+                elements.errorMessage.style.display = 'block';
+                setTimeout(() => {
+                    elements.errorMessage.style.display = 'none';
+                }, 5000);
+            }
+
+            window.addEventListener('resize', () => {
+                if (!camera) return;
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        });
+    </script>
+</body>
+</html>
