@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AR Furniture Viewer - FurniAR</title>
     
+    <!-- Permissions Policy for XR and Camera -->
+    <meta http-equiv="Permissions-Policy" content="xr-spatial-tracking=*, camera=*">
+    
     <!-- Model Viewer for AR functionality -->
     <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     
@@ -363,15 +366,18 @@
 
             <div class="ar-instructions" id="arInstructions">
                 <button class="close-instructions" onclick="hideInstructions()">×</button>
-                <h4>📱 AR Instructions</h4>
+                <h4>📱 AR Placement Instructions</h4>
                 <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
-                    <li>Tap the "View in AR" button below</li>
-                    <li>Point your camera at a flat surface</li>
-                    <li>Move your device to find the surface</li>
-                    <li>Tap to place the furniture</li>
-                    <li>Walk around to see it from different angles</li>
+                    <li><strong>Step 1:</strong> Click "View in AR" and grant camera permission</li>
+                    <li><strong>Step 2:</strong> Point camera at a flat surface (floor/table)</li>
+                    <li><strong>Step 3:</strong> Move device slowly to detect the surface</li>
+                    <li><strong>Step 4:</strong> Tap to place furniture in your space</li>
+                    <li><strong>Step 5:</strong> Use touch gestures to rotate (no scaling)</li>
+                    <li><strong>Step 6:</strong> Walk around to see from all angles</li>
                 </ul>
-                <p><strong>Note:</strong> AR requires a compatible device with camera access</p>
+                <div style="background: rgba(255, 107, 107, 0.2); padding: 0.5rem; border-radius: 5px; margin-top: 0.5rem;">
+                    <strong>🔒 Privacy:</strong> Camera data stays on your device and isn't stored
+                </div>
             </div>
 
             <model-viewer
@@ -380,6 +386,7 @@
                 alt="3D Furniture Model"
                 ar
                 ar-modes="webxr scene-viewer quick-look"
+                ar-scale="fixed"
                 camera-controls
                 touch-action="pan-y"
                 auto-rotate
@@ -389,6 +396,7 @@
                 exposure="1"
                 shadow-softness="0.5"
                 environment-image="neutral"
+                interaction-policy="allow-when-focused"
                 loading="lazy">
                 
                 <div slot="progress-bar">
@@ -396,6 +404,14 @@
                         <div class="spinner"></div>
                         <p>Loading 3D model...</p>
                     </div>
+                </div>
+                
+                <!-- AR placement instructions -->
+                <div slot="ar-button" id="custom-ar-button">
+                    <button class="ar-btn" onclick="activateAR()">
+                        <span>📱</span>
+                        View in AR
+                    </button>
                 </div>
             </model-viewer>
         </div>
@@ -412,11 +428,11 @@
             </div>
 
             <div class="control-group">
-                <h3>🔄 View Controls</h3>
+                <h3>🔄 AR Controls</h3>
                 <div class="control-buttons">
-                    <button class="control-btn" onclick="resetView()">Reset View</button>
-                    <button class="control-btn" onclick="toggleAutoRotate()">Auto Rotate</button>
-                    <button class="control-btn" onclick="takeScreenshot()">Screenshot</button>
+                    <button class="control-btn" onclick="resetARPlacement()">Reset Position</button>
+                    <button class="control-btn" onclick="toggleARInstructions()">AR Help</button>
+                    <button class="control-btn" onclick="checkARSupport()">Check AR Status</button>
                 </div>
             </div>
 
@@ -556,12 +572,39 @@
                 updateStatus('error', '❌ Error loading 3D model');
             });
 
-            // AR events
+            // AR session events
             modelViewer.addEventListener('ar-status', (event) => {
-                if (event.detail.status === 'session-started') {
-                    updateStatus('ready', '📱 AR session active');
-                } else if (event.detail.status === 'not-presenting') {
-                    updateStatus('ready', 'AR session ended');
+                console.log('AR Status:', event.detail);
+                
+                switch(event.detail.status) {
+                    case 'session-started':
+                        updateStatus('ready', '🎯 AR Active - Point at surface and tap to place');
+                        break;
+                    case 'object-placed':
+                        updateStatus('ready', '✅ Furniture placed! Touch to rotate, walk around to explore');
+                        break;
+                    case 'failed':
+                        updateStatus('error', '❌ AR session failed. Try again or check device compatibility');
+                        break;
+                    case 'not-presenting':
+                        updateStatus('ready', 'AR session ended');
+                        break;
+                }
+            });
+
+            // Enhanced AR tracking events
+            modelViewer.addEventListener('tracking-status', (event) => {
+                if (event.detail.status === 'tracking') {
+                    updateStatus('ready', '📡 Surface detected - tap to place furniture');
+                } else if (event.detail.status === 'not-tracking') {
+                    updateStatus('ready', '🔍 Looking for surface - move camera slowly');
+                }
+            });
+
+            // AR placement events
+            modelViewer.addEventListener('ar-tracking', (event) => {
+                if (event.detail.state === 'tracking') {
+                    updateStatus('ready', '📍 Ready to place - tap on the surface');
                 }
             });
 
@@ -642,27 +685,192 @@
             statusElement.textContent = message;
         }
 
-        function activateAR() {
-            if (modelViewer && modelViewer.canActivateAR) {
-                modelViewer.activateAR();
-                updateStatus('ready', 'Opening AR viewer...');
-            } else {
-                // Fallback for unsupported devices
-                updateStatus('error', 'AR not supported on this device. Try on mobile.');
+        async function activateAR() {
+            try {
+                updateStatus('ready', '🔍 Checking AR capabilities...');
+
+                // First check if model-viewer supports AR
+                if (!modelViewer || !modelViewer.canActivateAR) {
+                    updateStatus('error', '📱 AR not supported on this device/browser');
+                    showARAlternatives();
+                    return;
+                }
+
+                // Request camera permission first
+                const permissionResult = await requestCameraPermission();
                 
-                // Show alternative options
-                setTimeout(() => {
-                    updateStatus('ready', 'Use camera controls to explore the 3D model');
-                }, 3000);
+                if (!permissionResult) {
+                    updateStatus('error', 'Camera permission required for AR experience');
+                    return;
+                }
+
+                // Try to activate AR with error handling
+                try {
+                    updateStatus('ready', '🚀 Starting AR session...');
+                    await modelViewer.activateAR();
+                } catch (arError) {
+                    console.error('AR activation failed:', arError);
+                    updateStatus('error', '❌ AR session failed to start');
+                    showARAlternatives();
+                }
+
+            } catch (error) {
+                console.error('AR activation error:', error);
+                updateStatus('error', 'Failed to activate AR. Using 3D viewer mode.');
+                showARAlternatives();
             }
         }
 
-        function resetView() {
-            if (modelViewer) {
-                modelViewer.resetTurntableRotation();
-                modelViewer.jumpCameraToGoal();
-                updateStatus('ready', 'View reset to default position');
+        function showARAlternatives() {
+            setTimeout(() => {
+                updateStatus('ready', '💡 Try: Rotate 3D model with touch gestures, take screenshots, or share link');
+            }, 3000);
+        }
+
+        async function requestCameraPermission() {
+            return new Promise((resolve) => {
+                // Show custom alert for camera permission
+                const userConsent = confirm(
+                    "🎯 AR Camera Permission Required\n\n" +
+                    "To place furniture in your real environment, we need access to your camera.\n\n" +
+                    "This allows you to:\n" +
+                    "• See furniture in your actual space\n" +
+                    "• Position items accurately\n" +
+                    "• Walk around and view from all angles\n\n" +
+                    "Your privacy is protected - we don't store camera data.\n\n" +
+                    "Click OK to grant camera permission, or Cancel to continue in 3D mode."
+                );
+
+                if (userConsent) {
+                    // Check if we can access camera API
+                    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                        navigator.mediaDevices.getUserMedia({ 
+                            video: { 
+                                facingMode: 'environment',
+                                width: { ideal: 1280 },
+                                height: { ideal: 720 }
+                            } 
+                        })
+                        .then(stream => {
+                            // Stop the stream immediately - we just needed permission
+                            stream.getTracks().forEach(track => track.stop());
+                            updateStatus('ready', '✅ Camera permission granted! Initializing AR...');
+                            resolve(true);
+                        })
+                        .catch(error => {
+                            console.error('Camera permission error:', error);
+                            handleCameraError(error);
+                            resolve(false);
+                        });
+                    } else {
+                        updateStatus('error', 'Camera API not available in this browser');
+                        resolve(false);
+                    }
+                } else {
+                    updateStatus('ready', 'Camera permission declined. Using 3D viewer mode.');
+                    resolve(false);
+                }
+            });
+        }
+
+        function handleCameraError(error) {
+            switch(error.name) {
+                case 'NotAllowedError':
+                    updateStatus('error', '❌ Camera permission denied. Enable camera in browser settings');
+                    showCameraHelp();
+                    break;
+                case 'NotFoundError':
+                    updateStatus('error', '📷 No camera found on this device');
+                    break;
+                case 'NotReadableError':
+                    updateStatus('error', '🔒 Camera is being used by another app');
+                    break;
+                case 'OverconstrainedError':
+                    updateStatus('error', '⚙️ Camera settings not supported');
+                    break;
+                case 'SecurityError':
+                    updateStatus('error', '🛡️ Camera access blocked by browser security');
+                    showCameraHelp();
+                    break;
+                default:
+                    updateStatus('error', '❌ Camera access failed: ' + (error.message || 'Unknown error'));
             }
+        }
+
+        function showCameraHelp() {
+            setTimeout(() => {
+                alert(
+                    "📷 Camera Permission Help\n\n" +
+                    "If camera permission was denied:\n\n" +
+                    "Chrome/Edge:\n" +
+                    "• Click the camera icon in address bar\n" +
+                    "• Select 'Allow' for camera access\n" +
+                    "• Refresh the page\n\n" +
+                    "Safari:\n" +
+                    "• Go to Settings > Safari > Camera\n" +
+                    "• Select 'Allow' for this website\n\n" +
+                    "Firefox:\n" +
+                    "• Click shield icon in address bar\n" +
+                    "• Enable camera permissions\n\n" +
+                    "Then try AR again!"
+                );
+            }, 2000);
+        }
+
+        function resetARPlacement() {
+            if (modelViewer) {
+                // Reset the model position in AR
+                if (modelViewer.arStatus === 'session-started') {
+                    modelViewer.dismissPoster();
+                    updateStatus('ready', '🔄 AR placement reset - tap to place again');
+                } else {
+                    // Reset normal 3D view
+                    modelViewer.resetTurntableRotation();
+                    modelViewer.jumpCameraToGoal();
+                    updateStatus('ready', 'View reset to default position');
+                }
+            }
+        }
+
+        function toggleARInstructions() {
+            const instructions = document.getElementById('arInstructions');
+            if (instructions.classList.contains('hidden')) {
+                instructions.classList.remove('hidden');
+                updateStatus('ready', 'AR instructions shown');
+            } else {
+                instructions.classList.add('hidden');
+                updateStatus('ready', 'AR instructions hidden');
+            }
+        }
+
+        function checkARSupport() {
+            const isARSupported = modelViewer && modelViewer.canActivateAR;
+            const hasWebXR = 'xr' in navigator;
+            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            let statusMessage = '';
+            
+            if (isARSupported) {
+                statusMessage = '✅ AR fully supported on this device';
+            } else if (hasWebXR && isMobile) {
+                statusMessage = '⚠️ AR partially supported - try updating browser';
+            } else if (isMobile) {
+                statusMessage = '📱 Mobile device detected - AR may work with compatible browser';
+            } else {
+                statusMessage = '💻 Desktop detected - AR requires mobile device';
+            }
+            
+            updateStatus('ready', statusMessage);
+            
+            // Show detailed AR support info
+            setTimeout(() => {
+                console.log('AR Support Details:', {
+                    canActivateAR: isARSupported,
+                    hasWebXR: hasWebXR,
+                    isMobile: isMobile,
+                    userAgent: navigator.userAgent
+                });
+            }, 1000);
         }
 
         function toggleAutoRotate() {
@@ -725,23 +933,123 @@
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', initializeAR);
 
-        // Auto-hide instructions after 10 seconds
+        // Auto-hide instructions after 15 seconds (increased time for AR instructions)
         setTimeout(() => {
             hideInstructions();
-        }, 10000);
+        }, 15000);
 
-        // Check AR availability
-        if ('xr' in navigator) {
-            navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
-                if (supported) {
-                    updateStatus('ready', 'AR supported! Ready to place furniture');
+        // Enhanced AR availability check
+        async function performARCheck() {
+            try {
+                // Basic feature detection
+                const hasWebXR = 'xr' in navigator;
+                const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                const isSecureContext = window.isSecureContext;
+
+                console.log('AR Check:', { hasWebXR, isMobile, isSecureContext });
+
+                if (!isSecureContext) {
+                    updateStatus('error', '🔒 AR requires HTTPS. Please use secure connection');
+                    return;
+                }
+
+                if (hasWebXR) {
+                    try {
+                        // Try to check XR support with error handling
+                        const isARSupported = await Promise.race([
+                            navigator.xr.isSessionSupported('immersive-ar'),
+                            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+                        ]);
+                        
+                        if (isARSupported) {
+                            updateStatus('ready', '🎯 Full AR supported! Click AR button when ready');
+                        } else {
+                            updateStatus('ready', '📱 3D viewer ready. AR may have limited support');
+                        }
+                    } catch (xrError) {
+                        console.warn('XR check failed:', xrError.message);
+                        
+                        if (isMobile) {
+                            updateStatus('ready', '📱 Mobile detected. AR may work - try the AR button!');
+                        } else {
+                            updateStatus('ready', '🖥️ Desktop mode. 3D viewer available, AR needs mobile device');
+                        }
+                    }
                 } else {
-                    updateStatus('ready', 'Limited AR support. Use 3D viewer mode');
+                    if (isMobile) {
+                        // Mobile without WebXR might still support AR through other means
+                        updateStatus('ready', '📱 Mobile device. AR may work through browser features');
+                    } else {
+                        updateStatus('ready', '🖥️ Desktop mode - enjoy the 3D viewer! AR requires mobile');
+                    }
+                }
+
+            } catch (error) {
+                console.error('AR capability check failed:', error);
+                updateStatus('ready', '🔍 AR capabilities unknown - try the AR button to test!');
+            }
+        }
+
+        // Run AR check
+        performARCheck();
+
+        // Additional permission check for iOS Safari and other browsers
+        function checkCameraPermissions() {
+            // Only try permission query if it's supported and won't cause errors
+            if (navigator.permissions && navigator.permissions.query && window.isSecureContext) {
+                navigator.permissions.query({ name: 'camera' })
+                    .then(permission => {
+                        console.log('Camera permission status:', permission.state);
+                        switch(permission.state) {
+                            case 'granted':
+                                updateStatus('ready', '📹 Camera permitted - AR ready to use!');
+                                break;
+                            case 'prompt':
+                                updateStatus('ready', '🎯 AR ready - camera permission will be requested');
+                                break;
+                            case 'denied':
+                                updateStatus('ready', '📷 Camera permission needed - will prompt when using AR');
+                                break;
+                        }
+                    })
+                    .catch(err => {
+                        console.log('Permission query not supported or failed:', err);
+                        // Don't show error to user for this
+                    });
+            } else {
+                console.log('Permission API not available or not in secure context');
+            }
+        }
+
+        function setupModelViewerErrorHandling() {
+            // Handle model-viewer specific errors
+            modelViewer.addEventListener('error', (event) => {
+                console.error('Model viewer error:', event);
+                updateStatus('error', '❌ 3D model loading failed');
+            });
+
+            // Handle AR-specific errors
+            modelViewer.addEventListener('ar-status', (event) => {
+                console.log('AR Status Event:', event.detail);
+                
+                if (event.detail.status === 'failed') {
+                    updateStatus('error', '❌ AR failed - trying fallback mode');
+                    // Could implement fallback AR mode here
                 }
             });
-        } else {
-            updateStatus('ready', '3D model ready. AR requires compatible mobile device');
+
+            // Catch any uncaught model-viewer errors
+            window.addEventListener('unhandledrejection', (event) => {
+                if (event.reason && event.reason.message && 
+                    (event.reason.message.includes('XR') || event.reason.message.includes('WebXR'))) {
+                    console.warn('Suppressed XR-related error:', event.reason.message);
+                    event.preventDefault(); // Prevent the error from showing in console
+                }
+            });
         }
+
+        // Check camera permissions on load
+        setTimeout(checkCameraPermissions, 1000);
     </script>
 </body>
 </html>

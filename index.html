@@ -1,470 +1,3363 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FurniAR - Premium Furniture Store</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AR Store Admin Dashboard</title>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    .sidebar-link.active {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 0.5rem;
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .slide-in {
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(0); }
+    }
+    
+    .pulse-glow {
+      box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+    }
 
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1rem 0;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .nav {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 2rem;
-        }
-
-        .logo {
-            font-size: 2rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: #667eea;
-        }
-
-        .hero {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: white;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 4rem;
-        }
-
-        .product-card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .product-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .product-image {
-            width: 100%;
-            height: 250px;
-            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            color: #666;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .product-image::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="10" y="20" width="80" height="50" fill="%23ddd" rx="5"/><rect x="20" y="35" width="15" height="20" fill="%23bbb"/><rect x="65" y="35" width="15" height="20" fill="%23bbb"/></svg>') center/60% no-repeat;
-            opacity: 0.3;
-        }
-
-        .product-info {
-            padding: 1.5rem;
-        }
-
-        .product-title {
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            color: #333;
-        }
-
-        .product-price {
-            font-size: 1.5rem;
-            color: #667eea;
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-
-        .product-description {
-            color: #666;
-            margin-bottom: 1.5rem;
-            line-height: 1.5;
-        }
-
-        .product-actions {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .btn {
-            padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            flex: 1;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-ar {
-            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
-            color: white;
-            flex: 1;
-        }
-
-        .btn-ar:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
-        }
-
-        .ar-icon {
-            width: 16px;
-            height: 16px;
-            margin-right: 0.5rem;
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin: 4rem 0;
-        }
-
-        .feature {
-            text-align: center;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            color: white;
-        }
-
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 1rem;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .footer {
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            text-align: center;
-            padding: 2rem;
-            margin-top: 4rem;
-        }
-
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .nav {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .nav-links {
-                gap: 1rem;
-            }
-            
-            .product-actions {
-                flex-direction: column;
-            }
-        }
-    </style>
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    
+    .hover-scale {
+      transition: transform 0.2s ease;
+    }
+    
+    .hover-scale:hover {
+      transform: scale(1.05);
+    }
+    
+    .status-active {
+      background: linear-gradient(45deg, #10b981, #34d399);
+    }
+    
+    .status-pending {
+      background: linear-gradient(45deg, #f59e0b, #fbbf24);
+    }
+    
+    .status-disabled {
+      background: linear-gradient(45deg, #ef4444, #f87171);
+    }
+    
+    .notification-badge {
+      position: relative;
+    }
+    
+    .notification-badge::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 8px;
+      height: 8px;
+      background: #ef4444;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    .dark-mode {
+      background-color: #1f2937;
+      color: #f9fafb;
+    }
+    
+    .dark-mode .bg-white {
+      background-color: #374151;
+    }
+    
+    .dark-mode .text-gray-700 {
+      color: #f3f4f6;
+    }
+    
+    .dark-mode .border-gray-300 {
+      border-color: #4b5563;
+    }
+  </style>
 </head>
-<body>
-    <header class="header">
-        <nav class="nav">
-            <div class="logo">FurniAR</div>
-            <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#products">Products</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
+<body class="flex h-screen overflow-hidden relative bg-gray-50">
 
-    <section class="hero" id="home">
-        <h1>Experience Furniture in AR</h1>
-        <p>Visualize how our premium furniture looks in your space before you buy</p>
-    </section>
+  <!-- Sidebar -->
+  <div
+    id="sidebar"
+    class="left bg-gradient-to-b from-[#03163F] to-[#1e3a8a] flex flex-col p-6 fixed inset-y-0 left-0 w-64 transform -translate-x-full md:translate-x-0 transition-all duration-300 z-50 overflow-y-auto shadow-2xl"
+  >
+    <div class="logo mb-8 text-center">
+      <div class="w-16 h-16 mx-auto bg-white rounded-full flex items-center justify-center mb-2">
+        <i class="fas fa-store text-[#03163F] text-2xl"></i>
+      </div>
+      <h1 class="text-white font-bold text-lg">AR Store Admin</h1>
+    </div>
+    
+    <nav class="flex flex-col gap-2 text-white font-semibold text-sm">
+      <button data-target="dashboard" class="sidebar-link flex gap-3 items-center hover:bg-white hover:bg-opacity-10 transition-all p-3 rounded-lg active">
+        <i class="fas fa-chart-pie"></i><span>Dashboard</span>
+      </button>
+      <button data-target="products" class="sidebar-link flex gap-3 items-center hover:bg-white hover:bg-opacity-10 transition-all p-3 rounded-lg">
+        <i class="fas fa-box"></i><span>Products</span>
+      </button>
+      <button data-target="orders" class="sidebar-link flex gap-3 items-center hover:bg-white hover:bg-opacity-10 transition-all p-3 rounded-lg">
+        <i class="fas fa-shopping-cart"></i><span>Orders</span>
+      </button>
+      <button data-target="users" class="sidebar-link flex gap-3 items-center hover:bg-white hover:bg-opacity-10 transition-all p-3 rounded-lg">
+        <i class="fas fa-users"></i><span>Users</span>
+      </button>
+      <button data-target="categories" class="sidebar-link flex gap-3 items-center hover:bg-white hover:bg-opacity-10 transition-all p-3 rounded-lg">
+        <i class="fas fa-tags"></i><span>Categories</span>
+      </button>
+      <button data-target="reviews" class="sidebar-link flex gap-3 items-center hover:bg-white hover:bg-opacity-10 transition-all p-3 rounded-lg">
+        <i class="fas fa-star"></i><span>Reviews</span>
+      </button>
+      <button data-target="ar-models" class="sidebar-link flex gap-3 items-center hover:bg-white hover:bg-opacity-10 transition-all p-3 rounded-lg">
+        <i class="fas fa-cube"></i><span>AR Models</span>
+      </button>
+      <button data-target="analytics" class="sidebar-link flex gap-3 items-center hover:bg-white hover:bg-opacity-10 transition-all p-3 rounded-lg">
+        <i class="fas fa-chart-bar"></i><span>Analytics</span>
+      </button>
+      <button data-target="sales-reports" class="sidebar-link flex gap-3 items-center hover:bg-white hover:bg-opacity-10 transition-all p-3 rounded-lg">
+        <i class="fas fa-dollar-sign"></i><span>Sales & Reports</span>
+      </button>
+      <button data-target="settings" class="sidebar-link flex gap-3 items-center hover:bg-white hover:bg-opacity-10 transition-all p-3 rounded-lg">
+        <i class="fas fa-cog"></i><span>Settings</span>
+      </button>
+      <button data-target="shop" class="sidebar-link flex gap-3 items-center hover:bg-white hover:bg-opacity-10 transition-all p-3 rounded-lg">
+        <i class="fas fa-shopping-bag"></i><span>Shop</span>
+      </button>
+      
+      <div class="mt-8 pt-4 border-t border-white border-opacity-20">
+        <button id="theme-toggle" class="flex gap-3 items-center hover:bg-white hover:bg-opacity-10 transition-all p-3 rounded-lg w-full text-left">
+          <i class="fas fa-moon"></i><span>Dark Mode</span>
+        </button>
+        <button onclick="logout()" class="flex gap-3 items-center mt-2 text-red-400 font-semibold hover:bg-red-500 hover:bg-opacity-20 transition-all p-3 rounded-lg w-full text-left">
+          <i class="fas fa-sign-out-alt"></i><span>Sign Out</span>
+        </button>
+      </div>
+    </nav>
+  </div>
 
-    <div class="container">
-        <section class="features">
-            <div class="feature">
-                <div class="feature-icon">🏠</div>
-                <h3>Try Before You Buy</h3>
-                <p>See exactly how furniture fits in your room with augmented reality</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">📱</div>
-                <h3>Mobile AR</h3>
-                <p>Use your smartphone or tablet to place 3D models in your space</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">✨</div>
-                <h3>Premium Quality</h3>
-                <p>Carefully crafted furniture with attention to every detail</p>
-            </div>
-        </section>
+  <!-- Overlay -->
+  <div
+    id="overlay"
+    class="fixed inset-0 bg-black bg-opacity-50 hidden z-40 md:hidden"
+  ></div>
 
-        <h2 class="section-title" id="products">Our Products</h2>
-        <div class="products-grid">
-            <div class="product-card">
-                <div class="product-image">Modern Sofa Placeholder</div>
-                <div class="product-info">
-                    <h3 class="product-title">Modern 3-Seat Sofa</h3>
-                    <div class="product-price">$1,299</div>
-                    <p class="product-description">Comfortable modern sofa with premium fabric upholstery. Perfect for contemporary living rooms.</p>
-                    <div class="product-actions">
-                        <button class="btn btn-primary">Add to Cart</button>
-                        <a href="ar.html?product=sofa" class="btn btn-ar">
-                            <svg class="ar-icon" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2L2 7v10c0 5.55 3.84 10 9 11 1.11-.45 2.15-1.05 3.08-1.77C14.6 22.12 15.29 18.85 16 15.5 17.5 15.5 19 14 19 12.5V7L12 2z"/>
-                            </svg>
-                            View in AR
-                        </a>
-                    </div>
-                </div>
-            </div>
+  <!-- Main content wrapper -->
+  <div class="right flex flex-col flex-1 ml-0 md:ml-64 overflow-auto">
 
-            <div class="product-card">
-                <div class="product-image">Dining Table Placeholder</div>
-                <div class="product-info">
-                    <h3 class="product-title">Oak Dining Table</h3>
-                    <div class="product-price">$899</div>
-                    <p class="product-description">Solid oak dining table seats 6 people comfortably. Handcrafted with natural wood finish.</p>
-                    <div class="product-actions">
-                        <button class="btn btn-primary">Add to Cart</button>
-                        <a href="ar.html?product=table" class="btn btn-ar">
-                            <svg class="ar-icon" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2L2 7v10c0 5.55 3.84 10 9 11 1.11-.45 2.15-1.05 3.08-1.77C14.6 22.12 15.29 18.85 16 15.5 17.5 15.5 19 14 19 12.5V7L12 2z"/>
-                            </svg>
-                            View in AR
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-image">Armchair Placeholder</div>
-                <div class="product-info">
-                    <h3 class="product-title">Leather Armchair</h3>
-                    <div class="product-price">$749</div>
-                    <p class="product-description">Luxurious leather armchair with ergonomic design. Perfect reading chair for your living space.</p>
-                    <div class="product-actions">
-                        <button class="btn btn-primary">Add to Cart</button>
-                        <a href="ar.html?product=chair" class="btn btn-ar">
-                            <svg class="ar-icon" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2L2 7v10c0 5.55 3.84 10 9 11 1.11-.45 2.15-1.05 3.08-1.77C14.6 22.12 15.29 18.85 16 15.5 17.5 15.5 19 14 19 12.5V7L12 2z"/>
-                            </svg>
-                            View in AR
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-image">Coffee Table Placeholder</div>
-                <div class="product-info">
-                    <h3 class="product-title">Glass Coffee Table</h3>
-                    <div class="product-price">$429</div>
-                    <p class="product-description">Modern glass coffee table with metal frame. Adds elegance to any living room setup.</p>
-                    <div class="product-actions">
-                        <button class="btn btn-primary">Add to Cart</button>
-                        <a href="ar.html?product=coffee-table" class="btn btn-ar">
-                            <svg class="ar-icon" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2L2 7v10c0 5.55 3.84 10 9 11 1.11-.45 2.15-1.05 3.08-1.77C14.6 22.12 15.29 18.85 16 15.5 17.5 15.5 19 14 19 12.5V7L12 2z"/>
-                            </svg>
-                            View in AR
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-image">Bookshelf Placeholder</div>
-                <div class="product-info">
-                    <h3 class="product-title">Modern Bookshelf</h3>
-                    <div class="product-price">$559</div>
-                    <p class="product-description">5-tier modern bookshelf with clean lines. Perfect for organizing books and displaying decor.</p>
-                    <div class="product-actions">
-                        <button class="btn btn-primary">Add to Cart</button>
-                        <a href="ar.html?product=bookshelf" class="btn btn-ar">
-                            <svg class="ar-icon" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2L2 7v10c0 5.55 3.84 10 9 11 1.11-.45 2.15-1.05 3.08-1.77C14.6 22.12 15.29 18.85 16 15.5 17.5 15.5 19 14 19 12.5V7L12 2z"/>
-                            </svg>
-                            View in AR
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-image">Bed Frame Placeholder</div>
-                <div class="product-info">
-                    <h3 class="product-title">Platform Bed Frame</h3>
-                    <div class="product-price">$679</div>
-                    <p class="product-description">Minimalist platform bed frame in walnut finish. Queen size with integrated nightstands.</p>
-                    <div class="product-actions">
-                        <button class="btn btn-primary">Add to Cart</button>
-                        <a href="ar.html?product=bed" class="btn btn-ar">
-                            <svg class="ar-icon" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2L2 7v10c0 5.55 3.84 10 9 11 1.11-.45 2.15-1.05 3.08-1.77C14.6 22.12 15.29 18.85 16 15.5 17.5 15.5 19 14 19 12.5V7L12 2z"/>
-                            </svg>
-                            View in AR
-                        </a>
-                    </div>
-                </div>
-            </div>
+    <!-- Top Bar -->
+    <div class="bar flex items-center justify-between p-4 bg-white border-b shadow-sm">
+      <div class="flex items-center gap-4">
+        <button
+          id="menu-toggle"
+          aria-label="Toggle menu"
+          class="text-[#03163F] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
+        >
+          <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <h3 class="text-xl font-bold text-gray-800">
+          <span id="page-title">Dashboard Overview</span>
+        </h3>
+      </div>
+      
+      <div class="flex items-center gap-4">
+        <div class="searchbar hidden md:flex items-center border border-gray-300 rounded-full px-3 py-2 gap-2 w-64 bg-gray-50">
+          <input
+            id="global-search"
+            type="text"
+            placeholder="Search everything..."
+            class="flex-grow bg-transparent outline-none text-gray-700"
+          />
+          <i class="fas fa-search text-gray-600"></i>
         </div>
+        
+        <div class="relative">
+          <button id="notifications-btn" class="notification-badge">
+            <i class="fas fa-bell text-[#03163F] text-xl hover:text-indigo-600 transition"></i>
+          </button>
+          <div id="notifications-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border z-50">
+            <div class="p-4 border-b">
+              <h4 class="font-semibold text-gray-800">Notifications</h4>
+            </div>
+            <div class="max-h-64 overflow-y-auto">
+              <div class="p-3 border-b hover:bg-gray-50 cursor-pointer">
+                <p class="text-sm font-medium">New order received</p>
+                <p class="text-xs text-gray-500">2 minutes ago</p>
+              </div>
+              <div class="p-3 border-b hover:bg-gray-50 cursor-pointer">
+                <p class="text-sm font-medium">Low stock alert: Sneakers</p>
+                <p class="text-xs text-gray-500">1 hour ago</p>
+              </div>
+              <div class="p-3 border-b hover:bg-gray-50 cursor-pointer">
+                <p class="text-sm font-medium">New user registered</p>
+                <p class="text-xs text-gray-500">3 hours ago</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="relative">
+          <button id="profile-btn" class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white font-semibold">
+            A
+          </button>
+          <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border z-50">
+            <div class="p-3 border-b">
+              <p class="font-semibold text-gray-800">Admin User</p>
+              <p class="text-sm text-gray-500">admin@arstore.com</p>
+            </div>
+            <button onclick="logout()" class="w-full text-left p-3 hover:bg-gray-50 text-red-600">
+              <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <footer class="footer">
-        <p>&copy; 2025 FurniAR. All rights reserved. | Experience furniture like never before with augmented reality.</p>
-    </footer>
+    <!-- Main Content Sections -->
+    <div class="sections flex flex-col gap-6 p-6 overflow-y-auto">
 
-    <script>
-        // Add smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
+      <!-- Dashboard Section -->
+      <section id="dashboard" class="section bg-white rounded-xl shadow-lg p-6 fade-in">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-3xl font-bold text-gray-800">Dashboard Overview</h2>
+          <div class="flex gap-2">
+            <button id="refresh-stats" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+              <i class="fas fa-sync-alt mr-2"></i>Refresh
+            </button>
+            <button id="export-data" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+              <i class="fas fa-download mr-2"></i>Export
+            </button>
+          </div>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div class="stats-card bg-gradient-to-r from-purple-600 to-purple-800 text-white rounded-xl shadow-lg p-6 hover-scale cursor-pointer" data-stats="users">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-lg font-semibold opacity-90">Total Users</h3>
+                <span class="text-3xl font-bold" id="total-users">1,247</span>
+                <p class="text-sm opacity-75">+12% this month</p>
+              </div>
+              <i class="fas fa-users text-4xl opacity-50"></i>
+            </div>
+          </div>
 
-        // Add to cart functionality
-        document.querySelectorAll('.btn-primary').forEach(button => {
-            button.addEventListener('click', function() {
-                const productCard = this.closest('.product-card');
-                const productTitle = productCard.querySelector('.product-title').textContent;
-                
-                // Simple cart simulation
-                button.textContent = 'Added!';
-                button.style.background = 'linear-gradient(45deg, #27ae60, #2ecc71)';
-                
-                setTimeout(() => {
-                    button.textContent = 'Add to Cart';
-                    button.style.background = 'linear-gradient(45deg, #667eea, #764ba2)';
-                }, 2000);
-                
-                console.log(`Added ${productTitle} to cart`);
-            });
-        });
+          <div class="stats-card bg-gradient-to-r from-green-600 to-green-800 text-white rounded-xl shadow-lg p-6 hover-scale cursor-pointer" data-stats="sales">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-lg font-semibold opacity-90">Total Sales</h3>
+                <span class="text-3xl font-bold" id="total-sales">$89,432</span>
+                <p class="text-sm opacity-75">+8% this month</p>
+              </div>
+              <i class="fas fa-dollar-sign text-4xl opacity-50"></i>
+            </div>
+          </div>
 
-        // Add some interactive hover effects
-        document.querySelectorAll('.product-card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-10px) scale(1.02)';
-            });
+          <div class="stats-card bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-xl shadow-lg p-6 hover-scale cursor-pointer" data-stats="products">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-lg font-semibold opacity-90">Total Products</h3>
+                <span class="text-3xl font-bold" id="total-products">342</span>
+                <p class="text-sm opacity-75">+5 new today</p>
+              </div>
+              <i class="fas fa-box text-4xl opacity-50"></i>
+            </div>
+          </div>
+
+          <div class="stats-card bg-gradient-to-r from-orange-600 to-orange-800 text-white rounded-xl shadow-lg p-6 hover-scale cursor-pointer" data-stats="ar-tries">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-lg font-semibold opacity-90">AR Tries</h3>
+                <span class="text-3xl font-bold" id="ar-tries">15,629</span>
+                <p class="text-sm opacity-75">+24% this week</p>
+              </div>
+              <i class="fas fa-vr-cardboard text-4xl opacity-50"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-xl font-semibold mb-4 text-gray-800">Recent Orders</h3>
+            <div id="recent-orders" class="space-y-3">
+              <!-- Will be populated by JavaScript -->
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-xl font-semibold mb-4 text-gray-800">Top Products</h3>
+            <div id="top-products" class="space-y-3">
+              <!-- Will be populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Products Section -->
+      <section id="products" class="section hidden bg-white rounded-xl shadow-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-3xl font-bold text-gray-800">Products Management</h2>
+          <div class="flex gap-2">
+            <button id="add-product-btn" class="bg-[#03163F] text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition pulse-glow">
+              <i class="fas fa-plus mr-2"></i>Add Product
+            </button>
+            <button id="import-products" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+              <i class="fas fa-upload mr-2"></i>Import
+            </button>
+          </div>
+        </div>
+        
+        <!-- Product Filters -->
+        <div class="mb-6 flex flex-wrap gap-4">
+          <select id="product-category-filter" class="border border-gray-300 rounded-lg px-3 py-2">
+            <option value="">All Categories</option>
+          </select>
+          <select id="product-status-filter" class="border border-gray-300 rounded-lg px-3 py-2">
+            <option value="">All Status</option>
+            <option value="Active">Active</option>
+            <option value="Disabled">Disabled</option>
+          </select>
+          <input type="text" id="product-search" placeholder="Search products..." class="border border-gray-300 rounded-lg px-3 py-2 flex-grow max-w-md">
+        </div>
+        
+        <!-- Products Grid -->
+        <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <!-- Will be populated by JavaScript -->
+        </div>
+      </section>
+
+      <!-- Orders Section -->
+      <section id="orders" class="section hidden bg-white rounded-xl shadow-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-3xl font-bold text-gray-800">Orders Management</h2>
+          <div class="flex gap-2">
+            <button id="export-orders" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+              <i class="fas fa-file-excel mr-2"></i>Export
+            </button>
+          </div>
+        </div>
+        
+        <!-- Order Filters -->
+        <div class="mb-6 flex flex-wrap gap-4">
+          <select id="order-status-filter" class="border border-gray-300 rounded-lg px-3 py-2">
+            <option value="">All Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Processing">Processing</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+          <input type="date" id="order-date-from" class="border border-gray-300 rounded-lg px-3 py-2">
+          <input type="date" id="order-date-to" class="border border-gray-300 rounded-lg px-3 py-2">
+          <input type="text" id="order-search" placeholder="Search orders..." class="border border-gray-300 rounded-lg px-3 py-2 flex-grow max-w-md">
+        </div>
+        
+        <!-- Orders Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full table-auto border-collapse border border-gray-300 rounded-lg overflow-hidden">
+            <thead>
+              <tr class="bg-gray-100 text-left">
+                <th class="border border-gray-300 px-4 py-3 font-semibold">Order ID</th>
+                <th class="border border-gray-300 px-4 py-3 font-semibold">Customer</th>
+                <th class="border border-gray-300 px-4 py-3 font-semibold">Products</th>
+                <th class="border border-gray-300 px-4 py-3 font-semibold">Status</th>
+                <th class="border border-gray-300 px-4 py-3 font-semibold">Total</th>
+                <th class="border border-gray-300 px-4 py-3 font-semibold">Date</th>
+                <th class="border border-gray-300 px-4 py-3 font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="orders-table-body">
+              <!-- Will be populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Users Section -->
+      <section id="users" class="section hidden bg-white rounded-xl shadow-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-3xl font-bold text-gray-800">User Management</h2>
+          <div class="flex gap-2">
+            <button id="add-user-btn" class="bg-[#03163F] text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+              <i class="fas fa-plus mr-2"></i>Add User
+            </button>
+            <button id="export-users" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+              <i class="fas fa-file-excel mr-2"></i>Export
+            </button>
+          </div>
+        </div>
+        
+        <!-- User Filters -->
+        <div class="mb-6 flex flex-wrap gap-4">
+          <select id="user-role-filter" class="border border-gray-300 rounded-lg px-3 py-2">
+            <option value="">All Roles</option>
+            <option value="customer">Customer</option>
+            <option value="admin">Admin</option>
+          </select>
+          <select id="user-status-filter" class="border border-gray-300 rounded-lg px-3 py-2">
+            <option value="">All Status</option>
+            <option value="Active">Active</option>
+            <option value="Suspended">Suspended</option>
+          </select>
+          <input type="text" id="user-search" placeholder="Search users..." class="border border-gray-300 rounded-lg px-3 py-2 flex-grow max-w-md">
+        </div>
+        
+        <!-- Users Grid -->
+        <div id="users-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Will be populated by JavaScript -->
+        </div>
+      </section>
+
+      <!-- Categories Section -->
+      <section id="categories" class="section hidden bg-white rounded-xl shadow-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-3xl font-bold text-gray-800">Categories & Tags</h2>
+          <button id="add-category-btn" class="bg-[#03163F] text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition pulse-glow">
+            <i class="fas fa-plus mr-2"></i>Add Category
+          </button>
+        </div>
+        
+        <!-- Categories Grid -->
+        <div id="categories-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Will be populated by JavaScript -->
+        </div>
+      </section>
+
+      <!-- Reviews Section -->
+      <section id="reviews" class="section hidden bg-white rounded-xl shadow-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-3xl font-bold text-gray-800">Customer Reviews</h2>
+          <div class="flex gap-2">
+            <select id="review-rating-filter" class="border border-gray-300 rounded-lg px-3 py-2">
+              <option value="">All Ratings</option>
+              <option value="5">5 Stars</option>
+              <option value="4">4 Stars</option>
+              <option value="3">3 Stars</option>
+              <option value="2">2 Stars</option>
+              <option value="1">1 Star</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Reviews List -->
+        <div id="reviews-list" class="space-y-4 max-h-96 overflow-auto">
+          <!-- Will be populated by JavaScript -->
+        </div>
+      </section>
+
+      <!-- AR Models Section -->
+      <section id="ar-models" class="section hidden bg-white rounded-xl shadow-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-3xl font-bold text-gray-800">AR Models</h2>
+          <button id="add-ar-model-btn" class="bg-[#03163F] text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+            <i class="fas fa-plus mr-2"></i>Add AR Model
+          </button>
+        </div>
+        
+        <!-- AR Models Grid -->
+        <div id="ar-models-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Will be populated by JavaScript -->
+        </div>
+      </section>
+
+      <!-- Analytics Section -->
+      <section id="analytics" class="section hidden bg-white rounded-xl shadow-lg p-6">
+        <h2 class="text-3xl font-bold mb-6 text-gray-800">Analytics Dashboard</h2>
+        
+        <!-- Chart Controls -->
+        <div class="mb-6 flex flex-wrap gap-4">
+          <select id="chart-timeframe" class="border border-gray-300 rounded-lg px-3 py-2">
+            <option value="7d">Last 7 Days</option>
+            <option value="30d">Last 30 Days</option>
+            <option value="90d">Last 90 Days</option>
+            <option value="1y" selected>Last Year</option>
+          </select>
+          <button id="refresh-charts" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+            <i class="fas fa-sync-alt mr-2"></i>Refresh Charts
+          </button>
+        </div>
+
+        <!-- Charts Container -->
+        <div class="space-y-8">
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-xl font-semibold mb-4 text-gray-800">Visitors Growth</h3>
+            <canvas id="visitorsChart" style="max-width: 100%; height: 300px;"></canvas>
+          </div>
+
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-xl font-semibold mb-4 text-gray-800">Sales Growth</h3>
+            <canvas id="salesChart" style="max-width: 100%; height: 300px;"></canvas>
+          </div>
+
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-xl font-semibold mb-4 text-gray-800">AR Tries Growth</h3>
+            <canvas id="arTriesChart" style="max-width: 100%; height: 300px;"></canvas>
+          </div>
+          
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-gray-50 rounded-xl p-6">
+              <h3 class="text-xl font-semibold mb-4 text-gray-800">Category Performance</h3>
+              <canvas id="categoryChart" style="max-width: 100%; height: 250px;"></canvas>
+            </div>
             
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0) scale(1)';
-            });
-        });
-    </script>
-</body>
+            <div class="bg-gray-50 rounded-xl p-6">
+              <h3 class="text-xl font-semibold mb-4 text-gray-800">User Demographics</h3>
+              <canvas id="demographicsChart" style="max-width: 100%; height: 250px;"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sales & Reports Section -->
+      <section id="sales-reports" class="section hidden bg-white rounded-xl shadow-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-3xl font-bold text-gray-800">Sales & Reports</h2>
+          <div class="flex gap-2">
+            <button id="generate-report" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+              <i class="fas fa-chart-line mr-2"></i>Generate Report
+            </button>
+            <button id="export-sales" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+              <i class="fas fa-download mr-2"></i>Export CSV
+            </button>
+          </div>
+        </div>
+        
+        <!-- Sales Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div class="bg-gradient-to-r from-emerald-500 to-emerald-700 text-white rounded-xl p-6">
+            <h3 class="text-lg font-semibold opacity-90">Today's Sales</h3>
+            <p class="text-3xl font-bold" id="today-sales">$2,847</p>
+            <p class="text-sm opacity-75">+15% vs yesterday</p>
+          </div>
+          <div class="bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-xl p-6">
+            <h3 class="text-lg font-semibold opacity-90">This Week</h3>
+            <p class="text-3xl font-bold" id="week-sales">$18,943</p>
+            <p class="text-sm opacity-75">+8% vs last week</p>
+          </div>
+          <div class="bg-gradient-to-r from-purple-500 to-purple-700 text-white rounded-xl p-6">
+            <h3 class="text-lg font-semibold opacity-90">This Month</h3>
+            <p class="text-3xl font-bold" id="month-sales">$76,234</p>
+            <p class="text-sm opacity-75">+12% vs last month</p>
+          </div>
+          <div class="bg-gradient-to-r from-orange-500 to-orange-700 text-white rounded-xl p-6">
+            <h3 class="text-lg font-semibold opacity-90">Average Order</h3>
+            <p class="text-3xl font-bold" id="avg-order">$127</p>
+            <p class="text-sm opacity-75">+3% improvement</p>
+          </div>
+        </div>
+        
+        <!-- Sales Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-xl font-semibold mb-4">Revenue by Product Category</h3>
+            <canvas id="categoryRevenueChart" style="height: 300px;"></canvas>
+          </div>
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-xl font-semibold mb-4">Sales Trend (Last 30 Days)</h3>
+            <canvas id="salesTrendChart" style="height: 300px;"></canvas>
+          </div>
+        </div>
+        
+        <!-- Best Selling Products -->
+        <div class="bg-gray-50 rounded-xl p-6">
+          <h3 class="text-xl font-semibold mb-4">Best Selling Products</h3>
+          <div id="best-selling-products" class="space-y-3">
+            <!-- Will be populated by JavaScript -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings Section -->
+      <section id="settings" class="section hidden bg-white rounded-xl shadow-lg p-6">
+        <h2 class="text-3xl font-bold mb-6 text-gray-800">Settings</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- General Settings -->
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-xl font-semibold mb-4">General Settings</h3>
+            <form id="general-settings-form" class="space-y-4">
+              <div>
+                <label class="block text-gray-700 font-medium mb-2">Store Name</label>
+                <input type="text" id="store-name" value="AR Fashion Store" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div>
+                <label class="block text-gray-700 font-medium mb-2">Store Email</label>
+                <input type="email" id="store-email" value="contact@arstore.com" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div>
+                <label class="block text-gray-700 font-medium mb-2">Currency</label>
+                <select id="store-currency" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  <option value="USD">USD - US Dollar</option>
+                  <option value="EUR">EUR - Euro</option>
+                  <option value="GBP">GBP - British Pound</option>
+                  <option value="XAF">XAF - Central African Franc</option>
+                </select>
+              </div>
+              <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+                Save Changes
+              </button>
+            </form>
+          </div>
+          
+          <!-- Notification Settings -->
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-xl font-semibold mb-4">Notification Settings</h3>
+            <form id="notification-settings-form" class="space-y-4">
+              <div class="flex items-center justify-between">
+                <label class="text-gray-700 font-medium">Email Notifications</label>
+                <input type="checkbox" id="email-notifications" checked class="toggle-checkbox">
+              </div>
+              <div class="flex items-center justify-between">
+                <label class="text-gray-700 font-medium">Order Alerts</label>
+                <input type="checkbox" id="order-alerts" checked class="toggle-checkbox">
+              </div>
+              <div class="flex items-center justify-between">
+                <label class="text-gray-700 font-medium">Low Stock Alerts</label>
+                <input type="checkbox" id="stock-alerts" checked class="toggle-checkbox">
+              </div>
+              <div class="flex items-center justify-between">
+                <label class="text-gray-700 font-medium">New User Notifications</label>
+                <input type="checkbox" id="user-notifications" class="toggle-checkbox">
+              </div>
+              <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+                Save Preferences
+              </button>
+            </form>
+          </div>
+          
+          <!-- Security Settings -->
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-xl font-semibold mb-4">Security Settings</h3>
+            <form id="security-settings-form" class="space-y-4">
+              <div>
+                <label class="block text-gray-700 font-medium mb-2">Current Password</label>
+                <input type="password" id="current-password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div>
+                <label class="block text-gray-700 font-medium mb-2">New Password</label>
+                <input type="password" id="new-password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div>
+                <label class="block text-gray-700 font-medium mb-2">Confirm New Password</label>
+                <input type="password" id="confirm-password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div class="flex items-center justify-between">
+                <label class="text-gray-700 font-medium">Two-Factor Authentication</label>
+                <input type="checkbox" id="two-factor" class="toggle-checkbox">
+              </div>
+              <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+                Update Security
+              </button>
+            </form>
+          </div>
+          
+          <!-- System Settings -->
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-xl font-semibold mb-4">System Settings</h3>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <label class="text-gray-700 font-medium">Maintenance Mode</label>
+                <input type="checkbox" id="maintenance-mode" class="toggle-checkbox">
+              </div>
+              <div class="flex items-center justify-between">
+                <label class="text-gray-700 font-medium">Auto Backup</label>
+                <input type="checkbox" id="auto-backup" checked class="toggle-checkbox">
+              </div>
+              <div class="flex items-center justify-between">
+                <label class="text-gray-700 font-medium">Debug Mode</label>
+                <input type="checkbox" id="debug-mode" class="toggle-checkbox">
+              </div>
+              <button id="clear-cache" class="bg-yellow-600 text-white px-6 py-2 rounded-lg hover:bg-yellow-700 transition w-full">
+                <i class="fas fa-broom mr-2"></i>Clear Cache
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Shop Section -->
+      <section id="shop" class="section hidden bg-white rounded-xl shadow-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-3xl font-bold text-gray-800">Shop Configuration</h2>
+          <button id="preview-shop" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+            <i class="fas fa-eye mr-2"></i>Preview Shop
+          </button>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Shop Appearance -->
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-xl font-semibold mb-4">Shop Appearance</h3>
+            <form class="space-y-4">
+              <div>
+                <label class="block text-gray-700 font-medium mb-2">Theme Color</label>
+                <input type="color" id="theme-color" value="#03163F" class="w-full h-12 border rounded-lg">
+              </div>
+              <div>
+                <label class="block text-gray-700 font-medium mb-2">Logo Upload</label>
+                <input type="file" id="shop-logo" accept="image/*" class="w-full border rounded-lg p-2">
+              </div>
+              <div>
+                <label class="block text-gray-700 font-medium mb-2">Banner Image</label>
+                <input type="file" id="shop-banner" accept="image/*" class="w-full border rounded-lg p-2">
+              </div>
+            </form>
+          </div>
+          
+          <!-- Shop Features -->
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-xl font-semibold mb-4">Shop Features</h3>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <label class="text-gray-700 font-medium">AR Try-On Feature</label>
+                <input type="checkbox" id="ar-feature" checked class="toggle-checkbox">
+              </div>
+              <div class="flex items-center justify-between">
+                <label class="text-gray-700 font-medium">Guest Checkout</label>
+                <input type="checkbox" id="guest-checkout" checked class="toggle-checkbox">
+              </div>
+              <div class="flex items-center justify-between">
+                <label class="text-gray-700 font-medium">Product Reviews</label>
+                <input type="checkbox" id="product-reviews" checked class="toggle-checkbox">
+              </div>
+              <div class="flex items-center justify-between">
+                <label class="text-gray-700 font-medium">Wishlist Feature</label>
+                <input type="checkbox" id="wishlist-feature" checked class="toggle-checkbox">
+              </div>
+              <div class="flex items-center justify-between">
+                <label class="text-gray-700 font-medium">Live Chat Support</label>
+                <input type="checkbox" id="live-chat" class="toggle-checkbox">
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Payment & Shipping -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-xl font-semibold mb-4">Payment Methods</h3>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                <div class="flex items-center gap-3">
+                  <i class="fab fa-cc-visa text-2xl text-blue-600"></i>
+                  <span>Credit Cards</span>
+                </div>
+                <input type="checkbox" checked class="toggle-checkbox">
+              </div>
+              <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                <div class="flex items-center gap-3">
+                  <i class="fab fa-paypal text-2xl text-blue-500"></i>
+                  <span>PayPal</span>
+                </div>
+                <input type="checkbox" checked class="toggle-checkbox">
+              </div>
+              <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                <div class="flex items-center gap-3">
+                  <i class="fas fa-mobile-alt text-2xl text-green-600"></i>
+                  <span>Mobile Money</span>
+                </div>
+                <input type="checkbox" checked class="toggle-checkbox">
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-xl font-semibold mb-4">Shipping Options</h3>
+            <div class="space-y-3">
+              <div class="p-3 bg-white rounded-lg">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-medium">Standard Shipping</span>
+                  <input type="checkbox" checked class="toggle-checkbox">
+                </div>
+                <input type="number" placeholder="Price" value="5" class="w-full px-3 py-2 border rounded text-sm">
+              </div>
+              <div class="p-3 bg-white rounded-lg">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-medium">Express Shipping</span>
+                  <input type="checkbox" checked class="toggle-checkbox">
+                </div>
+                <input type="number" placeholder="Price" value="15" class="w-full px-3 py-2 border rounded text-sm">
+              </div>
+              <div class="p-3 bg-white rounded-lg">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-medium">Free Shipping (>$50)</span>
+                  <input type="checkbox" checked class="toggle-checkbox">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Modals -->
+  
+  <!-- Add Category Modal -->
+  <div id="add-category-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-xl shadow-2xl w-11/12 md:w-1/2 p-6 max-h-screen overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-4 mb-4">
+        <h3 class="text-2xl font-semibold text-gray-800" id="category-modal-title">Add New Category</h3>
+        <button id="close-category-modal-btn" class="text-gray-500 hover:text-gray-800 transition">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <div id="category-modal-alert" class="hidden mb-4 p-3 rounded-lg"></div>
+      <form id="add-category-form">
+        <div class="mb-4">
+          <label for="cName" class="block text-gray-700 font-semibold mb-2">Category Name</label>
+          <input type="text" id="cName" name="cName" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+        </div>
+        <div class="mb-4">
+          <label for="cDescription" class="block text-gray-700 font-semibold mb-2">Description</label>
+          <textarea id="cDescription" name="cDescription" rows="3" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required></textarea>
+        </div>
+        <div class="mb-4">
+          <label for="cImage" class="block text-gray-700 font-semibold mb-2">Category Image</label>
+          <input type="file" id="cImage" name="cImage" accept="image/*" class="w-full p-2 border rounded-lg">
+        </div>
+        <div class="mb-6">
+          <label for="cStatus" class="block text-gray-700 font-semibold mb-2">Status</label>
+          <select id="cStatus" name="cStatus" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="Active">Active</option>
+            <option value="Disabled">Disabled</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button type="button" id="cancel-category" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+            Cancel
+          </button>
+          <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+            <span id="category-submit-text">Create Category</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Product Modal -->
+  <div id="add-product-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-xl shadow-2xl w-11/12 md:w-2/3 lg:w-1/2 p-6 max-h-screen overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-4 mb-4">
+        <h3 class="text-2xl font-semibold text-gray-800" id="product-modal-title">Add New Product</h3>
+        <button id="close-product-modal-btn" class="text-gray-500 hover:text-gray-800 transition">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <div id="product-modal-alert" class="hidden mb-4 p-3 rounded-lg"></div>
+      <form id="add-product-form">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="mb-4">
+            <label for="pName" class="block text-gray-700 font-semibold mb-2">Product Name</label>
+            <input type="text" id="pName" name="pName" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+          </div>
+          <div class="mb-4">
+            <label for="pPrice" class="block text-gray-700 font-semibold mb-2">Price ($)</label>
+            <input type="number" id="pPrice" name="pPrice" step="0.01" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label for="pDescription" class="block text-gray-700 font-semibold mb-2">Description</label>
+          <textarea id="pDescription" name="pDescription" rows="3" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required></textarea>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="mb-4">
+            <label for="pCategory" class="block text-gray-700 font-semibold mb-2">Category</label>
+            <select id="pCategory" name="pCategory" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+              <option value="">Select Category</option>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label for="pStock" class="block text-gray-700 font-semibold mb-2">Stock Quantity</label>
+            <input type="number" id="pStock" name="pStock" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label for="pImages" class="block text-gray-700 font-semibold mb-2">Product Images</label>
+          <input type="file" id="pImages" name="pImages" accept="image/*" multiple class="w-full p-2 border rounded-lg">
+          <p class="text-sm text-gray-500 mt-1">Select multiple images for product gallery</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="mb-6">
+            <label for="pStatus" class="block text-gray-700 font-semibold mb-2">Status</label>
+            <select id="pStatus" name="pStatus" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="Active">Active</option>
+              <option value="Disabled">Disabled</option>
+            </select>
+          </div>
+          <div class="mb-6">
+            <label for="pSKU" class="block text-gray-700 font-semibold mb-2">SKU</label>
+            <input type="text" id="pSKU" name="pSKU" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button type="button" id="cancel-product" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+            Cancel
+          </button>
+          <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+            <span id="product-submit-text">Create Product</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add User Modal -->
+  <div id="add-user-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-xl shadow-2xl w-11/12 md:w-1/2 p-6 max-h-screen overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-4 mb-4">
+        <h3 class="text-2xl font-semibold text-gray-800" id="user-modal-title">Add New User</h3>
+        <button id="close-user-modal-btn" class="text-gray-500 hover:text-gray-800 transition">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <div id="user-modal-alert" class="hidden mb-4 p-3 rounded-lg"></div>
+      <form id="add-user-form">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="mb-4">
+            <label for="uFirstName" class="block text-gray-700 font-semibold mb-2">First Name</label>
+            <input type="text" id="uFirstName" name="uFirstName" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+          </div>
+          <div class="mb-4">
+            <label for="uLastName" class="block text-gray-700 font-semibold mb-2">Last Name</label>
+            <input type="text" id="uLastName" name="uLastName" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label for="uEmail" class="block text-gray-700 font-semibold mb-2">Email</label>
+          <input type="email" id="uEmail" name="uEmail" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="mb-4">
+            <label for="uPhone" class="block text-gray-700 font-semibold mb-2">Phone</label>
+            <input type="tel" id="uPhone" name="uPhone" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div class="mb-4">
+            <label for="uRole" class="block text-gray-700 font-semibold mb-2">Role</label>
+            <select id="uRole" name="uRole" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+              <option value="customer">Customer</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+        </div>
+        <div class="mb-6">
+          <label for="uStatus" class="block text-gray-700 font-semibold mb-2">Status</label>
+          <select id="uStatus" name="uStatus" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="Active">Active</option>
+            <option value="Suspended">Suspended</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button type="button" id="cancel-user" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+            Cancel
+          </button>
+          <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+            <span id="user-submit-text">Create User</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add AR Model Modal -->
+  <div id="add-ar-model-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-xl shadow-2xl w-11/12 md:w-1/2 p-6 max-h-screen overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-4 mb-4">
+        <h3 class="text-2xl font-semibold text-gray-800" id="ar-model-modal-title">Add New AR Model</h3>
+        <button id="close-ar-model-modal-btn" class="text-gray-500 hover:text-gray-800 transition">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <div id="ar-model-modal-alert" class="hidden mb-4 p-3 rounded-lg"></div>
+      <form id="add-ar-model-form">
+        <div class="mb-4">
+          <label for="arName" class="block text-gray-700 font-semibold mb-2">Model Name</label>
+          <input type="text" id="arName" name="arName" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+        </div>
+        <div class="mb-4">
+          <label for="arProduct" class="block text-gray-700 font-semibold mb-2">Associated Product</label>
+          <select id="arProduct" name="arProduct" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+            <option value="">Select Product</option>
+          </select>
+        </div>
+        <div class="mb-4">
+          <label for="arFile" class="block text-gray-700 font-semibold mb-2">3D Model File (.glb, .gltf)</label>
+          <input type="file" id="arFile" name="arFile" accept=".glb,.gltf" class="w-full p-2 border rounded-lg">
+        </div>
+        <div class="mb-4">
+          <label for="arPreview" class="block text-gray-700 font-semibold mb-2">Preview Image</label>
+          <input type="file" id="arPreview" name="arPreview" accept="image/*" class="w-full p-2 border rounded-lg">
+        </div>
+        <div class="mb-6">
+          <label for="arStatus" class="block text-gray-700 font-semibold mb-2">Status</label>
+          <select id="arStatus" name="arStatus" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="Active">Active</option>
+            <option value="Testing">Testing</option>
+            <option value="Disabled">Disabled</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button type="button" id="cancel-ar-model" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+            Cancel
+          </button>
+          <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+            <span id="ar-model-submit-text">Create AR Model</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Order Details Modal -->
+  <div id="order-details-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-xl shadow-2xl w-11/12 md:w-2/3 p-6 max-h-screen overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-4 mb-4">
+        <h3 class="text-2xl font-semibold text-gray-800">Order Details</h3>
+        <button id="close-order-details-btn" class="text-gray-500 hover:text-gray-800 transition">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <div id="order-details-content">
+        <!-- Will be populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmation-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-xl shadow-2xl w-11/12 md:w-1/3 p-6">
+      <div class="text-center">
+        <i class="fas fa-exclamation-triangle text-6xl text-yellow-500 mb-4"></i>
+        <h3 class="text-xl font-semibold mb-2" id="confirmation-title">Confirm Action</h3>
+        <p class="text-gray-600 mb-6" id="confirmation-message">Are you sure you want to perform this action?</p>
+        <div class="flex justify-center gap-3">
+          <button id="cancel-confirmation" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+            Cancel
+          </button>
+          <button id="confirm-action" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition">
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+// --- AR Store Admin Dashboard JavaScript ---
+
+// Global state with enhanced structure
+const appState = {
+  currentSection: 'dashboard',
+  darkMode: false,
+  isSidebarOpen: false,
+  data: {
+    products: [],
+    orders: [],
+    users: [],
+    categories: [],
+    reviews: [],
+    arModels: [],
+    stats: {},
+    notifications: []
+  },
+  filters: {
+    products: {},
+    orders: {},
+    users: {},
+    reviews: {},
+    arModels: {}
+  },
+  pagination: {
+    products: { page: 1, perPage: 12, total: 0 },
+    orders: { page: 1, perPage: 10, total: 0 },
+    users: { page: 1, perPage: 9, total: 0 },
+    reviews: { page: 1, perPage: 10, total: 0 },
+    arModels: { page: 1, perPage: 9, total: 0 }
+  },
+  sort: {
+    products: { field: 'name', direction: 'asc' },
+    orders: { field: 'date', direction: 'desc' },
+    users: { field: 'joinDate', direction: 'desc' },
+    reviews: { field: 'date', direction: 'desc' },
+    arModels: { field: 'lastUpdated', direction: 'desc' }
+  }
+};
+
+// DOM Elements cache
+const domElements = {
+  sidebar: document.getElementById('sidebar'),
+  overlay: document.getElementById('overlay'),
+  menuToggle: document.getElementById('menu-toggle'),
+  themeToggle: document.getElementById('theme-toggle'),
+  notificationsBtn: document.getElementById('notifications-btn'),
+  notificationsDropdown: document.getElementById('notifications-dropdown'),
+  profileBtn: document.getElementById('profile-btn'),
+  profileDropdown: document.getElementById('profile-dropdown'),
+  globalSearch: document.getElementById('global-search'),
+  pageTitle: document.getElementById('page-title'),
+  sections: document.querySelectorAll('.section'),
+  sidebarLinks: document.querySelectorAll('.sidebar-link')
+};
+
+// Sample data initialization with more realistic data
+function initializeSampleData() {
+  // Categories
+  appState.data.categories = [
+    { id: 1, name: 'Sneakers', description: 'Athletic and casual footwear', status: 'Active', productCount: 45, image: 'https://via.placeholder.com/100x100?text=Sneakers' },
+    { id: 2, name: 'Clothing', description: 'Shirts, pants, and accessories', status: 'Active', productCount: 128, image: 'https://via.placeholder.com/100x100?text=Clothing' },
+    { id: 3, name: 'Accessories', description: 'Watches, bags, and jewelry', status: 'Active', productCount: 67, image: 'https://via.placeholder.com/100x100?text=Accessories' },
+    { id: 4, name: 'Electronics', description: 'Gadgets and tech accessories', status: 'Disabled', productCount: 23, image: 'https://via.placeholder.com/100x100?text=Electronics' }
+  ];
+
+  // Products (expanded with more realistic data)
+  appState.data.products = Array.from({ length: 50 }, (_, i) => {
+    const categories = ['Sneakers', 'Clothing', 'Accessories', 'Electronics'];
+    const category = categories[Math.floor(Math.random() * categories.length)];
+    const status = Math.random() > 0.2 ? 'Active' : 'Disabled';
+    const price = (Math.random() * 500 + 20).toFixed(2);
+    const stock = Math.floor(Math.random() * 100);
+    const sales = Math.floor(Math.random() * 500);
+    
+    return {
+      id: i + 1,
+      name: `${category === 'Sneakers' ? ['Air Jordan', 'Nike Dunk', 'Adidas Ultraboost', 'New Balance'][Math.floor(Math.random() * 4)] : 
+            category === 'Clothing' ? ['T-Shirt', 'Jeans', 'Jacket', 'Hoodie'][Math.floor(Math.random() * 4)] : 
+            category === 'Accessories' ? ['Watch', 'Backpack', 'Necklace', 'Sunglasses'][Math.floor(Math.random() * 4)] : 
+            ['Smart Watch', 'Headphones', 'Speaker', 'Charger'][Math.floor(Math.random() * 4)]} ${Math.floor(Math.random() * 10) + 1}`,
+      price: parseFloat(price),
+      category: category,
+      stock: stock,
+      status: status,
+      sku: `${category.substring(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
+      description: `High-quality ${category.toLowerCase()} product with premium features and durability.`,
+      image: `https://via.placeholder.com/200x200?text=Product+${i + 1}`,
+      sales: sales,
+      rating: (Math.random() * 2 + 3).toFixed(1),
+      arModel: Math.random() > 0.7
+    };
+  });
+
+  // Orders (expanded with more realistic data)
+  appState.data.orders = Array.from({ length: 100 }, (_, i) => {
+    const statuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+    const status = statuses[Math.floor(Math.random() * statuses.length)];
+    const customer = ['John Doe', 'Sarah Wilson', 'Mike Johnson', 'Emma Davis', 'Chris Brown', 'Alex Taylor', 'Jessica Lee'][Math.floor(Math.random() * 7)];
+    const customerEmail = customer.toLowerCase().replace(' ', '.') + '@example.com';
+    const productCount = Math.floor(Math.random() * 3) + 1;
+    const products = [];
+    let total = 0;
+    
+    for (let j = 0; j < productCount; j++) {
+      const randomProduct = appState.data.products[Math.floor(Math.random() * appState.data.products.length)];
+      products.push(randomProduct.name);
+      total += randomProduct.price;
+    }
+    
+    // Apply random discount
+    if (Math.random() > 0.7) {
+      total *= 0.9; // 10% discount
+    }
+    
+    // Add shipping cost
+    total += Math.random() > 0.5 ? 5 : 15;
+    
+    return {
+      id: `ORD-${1000 + i}`,
+      customer: customer,
+      customerEmail: customerEmail,
+      products: products,
+      status: status,
+      total: parseFloat(total.toFixed(2)),
+      date: new Date(Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+      shippingAddress: `${Math.floor(100 + Math.random() * 900)} ${['Main', 'Oak', 'Pine', 'Elm', 'Maple'][Math.floor(Math.random() * 5)]} St, City, State`,
+      paymentMethod: ['Credit Card', 'PayPal', 'Mobile Money'][Math.floor(Math.random() * 3)]
+    };
+  });
+
+  // Users (expanded with more realistic data)
+  appState.data.users = Array.from({ length: 50 }, (_, i) => {
+    const roles = ['customer', 'admin'];
+    const statuses = ['Active', 'Suspended'];
+    const firstName = ['John', 'Sarah', 'Mike', 'Emma', 'Chris', 'Alex', 'Jessica', 'David', 'Lisa', 'Robert'][Math.floor(Math.random() * 10)];
+    const lastName = ['Doe', 'Wilson', 'Johnson', 'Davis', 'Brown', 'Taylor', 'Lee', 'Smith', 'Williams', 'Jones'][Math.floor(Math.random() * 10)];
+    const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`;
+    const phone = `+1-555-${Math.floor(1000 + Math.random() * 9000)}`;
+    const role = i < 5 ? 'admin' : 'customer'; // First 5 are admins
+    const status = Math.random() > 0.1 ? 'Active' : 'Suspended';
+    
+    // Calculate user stats
+    const userOrders = appState.data.orders.filter(o => o.customer === `${firstName} ${lastName}`);
+    const totalOrders = userOrders.length;
+    const totalSpent = userOrders.reduce((sum, o) => sum + (o.status !== 'Cancelled' ? o.total : 0), 0);
+    
+    return {
+      id: i + 1,
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      phone: phone,
+      role: role,
+      status: status,
+      joinDate: new Date(Date.now() - Math.floor(Math.random() * 365 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+      totalOrders: totalOrders,
+      totalSpent: parseFloat(totalSpent.toFixed(2)),
+      lastLogin: new Date(Date.now() - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000)).toISOString()
+    };
+  });
+
+  // Reviews (expanded with more realistic data)
+  appState.data.reviews = Array.from({ length: 100 }, (_, i) => {
+    const user = appState.data.users[Math.floor(Math.random() * appState.data.users.length)];
+    const product = appState.data.products[Math.floor(Math.random() * appState.data.products.length)];
+    const ratings = [1, 2, 3, 4, 5];
+    const rating = ratings[Math.random() > 0.1 ? Math.floor(Math.random() * 2) + 3 : Math.floor(Math.random() * 2)]; // Mostly positive reviews
+    const comments = [
+      'Great product! Exactly as described.',
+      'Very satisfied with my purchase.',
+      'Quality could be better for the price.',
+      'Fast shipping and good packaging.',
+      'The AR preview was very accurate.',
+      'Not what I expected, returning it.',
+      'Perfect fit and comfortable.',
+      'Excellent customer service.',
+      'Would definitely buy again!',
+      'Disappointed with the quality.'
+    ];
+    const comment = comments[Math.floor(Math.random() * comments.length)];
+    
+    return {
+      id: i + 1,
+      product: product.name,
+      productId: product.id,
+      customer: `${user.firstName} ${user.lastName}`,
+      customerId: user.id,
+      rating: rating,
+      comment: comment,
+      date: new Date(Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+      helpful: Math.floor(Math.random() * 50),
+      images: Math.random() > 0.7 ? [`https://via.placeholder.com/150x150?text=Review+${i + 1}`] : []
+    };
+  });
+
+  // AR Models (expanded with more realistic data)
+  appState.data.arModels = appState.data.products
+    .filter(p => p.arModel)
+    .map((product, i) => ({
+      id: i + 1,
+      name: `${product.name} AR Model`,
+      product: product.name,
+      productId: product.id,
+      status: Math.random() > 0.2 ? 'Active' : (Math.random() > 0.5 ? 'Testing' : 'Disabled'),
+      fileSize: `${(Math.random() * 3 + 1).toFixed(1)} MB`,
+      lastUpdated: new Date(Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+      tries: Math.floor(Math.random() * 1000),
+      previewImage: product.image
+    }));
+
+  // Notifications
+  appState.data.notifications = [
+    { id: 1, type: 'order', message: 'New order received from John Doe', date: new Date(), read: false },
+    { id: 2, type: 'stock', message: 'Low stock alert: Nike Dunk Low (only 3 left)', date: new Date(Date.now() - 2 * 60 * 60 * 1000), read: false },
+    { id: 3, type: 'user', message: 'New user registered: Alex Taylor', date: new Date(Date.now() - 5 * 60 * 60 * 1000), read: true },
+    { id: 4, type: 'review', message: 'New 5-star review for Air Jordan 1', date: new Date(Date.now() - 8 * 60 * 60 * 1000), read: true },
+    { id: 5, type: 'system', message: 'Scheduled maintenance tonight at 2 AM', date: new Date(Date.now() - 24 * 60 * 60 * 1000), read: true }
+  ];
+
+  updateStats();
+  updatePaginationCounts();
+}
+
+// Statistics calculation with more metrics
+function updateStats() {
+  const now = new Date();
+  const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const last30Days = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+}
+  
+  // Recent orders (last 7 days)
+  const recentOrders = appState.data.orders.filter(o => 
+    new Date(o.date) >= last7Days && o.status !== 'Cancelled'
+  );
+  
+  // Recent users (last 30 days)
+  const recentUsers = appState.data.users.filter(u => 
+    new Date(u.joinDate) >= last30Days
+  );
+  
+  // Calculate conversion rate (orders/users)
+  const conversionRate = appState.data.users.length > 0 ? 
+    (appState.data.orders.length / appState.data.users.length * 100).toFixed(1) : 0;
+  
+  // AR try rate (products with AR models)
+  const arTryRate = (appState.data.arModels.length / appState.data.products.length * 100).toFixed(1);
+  // ...existing code...
+  appState.data.stats = {
+    totalUsers: appState.data.users.length,
+    activeUsers: appState.data.users.filter(u => u.status === 'Active').length,
+    newUsers: recentUsers.length,
+    totalSales: appState.data.orders.filter(o => o.status !== 'Cancelled').reduce((sum, o) => sum + o.total, 0),
+    recentSales: recentOrders.reduce((sum, o) => sum + o.total, 0),
+    avgOrderValue: appState.data.orders.length > 0 ? 
+      (appState.data.orders.reduce((sum, o) => sum + o.total, 0) / appState.data.orders.length) : 0,
+    totalProducts: appState.data.products.length,
+    activeProducts: appState.data.products.filter(p => p.status === 'Active').length,
+    outOfStock: appState.data.products.filter(p => p.stock <= 0).length,
+    arTries: appState.data.arModels.reduce((sum, m) => sum + m.tries, 0),
+    conversionRate: conversionRate,
+    arTryRate: arTryRate
+  };
+// Update pagination total counts
+function updatePaginationCounts() {
+  appState.pagination.products.total = appState.data.products.length;
+  appState.pagination.orders.total = appState.data.orders.length;
+  appState.pagination.users.total = appState.data.users.length;
+  appState.pagination.reviews.total = appState.data.reviews.length;
+  appState.pagination.arModels.total = appState.data.arModels.length;
+}
+
+// Utility functions with enhancements
+function getStatusClasses(status) {
+  const classes = {
+    'Active': 'bg-green-100 text-green-800',
+    'Delivered': 'bg-green-100 text-green-800',
+    'Pending': 'bg-yellow-100 text-yellow-800',
+    'Processing': 'bg-yellow-100 text-yellow-800',
+    'Testing': 'bg-yellow-100 text-yellow-800',
+    'Disabled': 'bg-red-100 text-red-800',
+    'Cancelled': 'bg-red-100 text-red-800',
+    'Suspended': 'bg-red-100 text-red-800',
+    'Shipped': 'bg-blue-100 text-blue-800'
+  };
+  return classes[status] || 'bg-gray-100 text-gray-800';
+}
+
+function formatDate(dateStr, includeTime = false) {
+  const options = { 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric',
+    ...(includeTime && { hour: '2-digit', minute: '2-digit' })
+  };
+  return new Date(dateStr).toLocaleDateString(undefined, options);
+}
+
+function formatCurrency(amount, currency = 'USD') {
+  return new Intl.NumberFormat(undefined, {
+    style: 'currency',
+    currency: currency
+  }).format(amount);
+}
+
+function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
+// Throttle function for scroll/resize events
+function throttle(func, limit) {
+  let lastFunc;
+  let lastRan;
+  return function() {
+    const context = this;
+    const args = arguments;
+    if (!lastRan) {
+      func.apply(context, args);
+      lastRan = Date.now();
+    } else {
+      clearTimeout(lastFunc);
+      lastFunc = setTimeout(function() {
+        if ((Date.now() - lastRan) >= limit) {
+          func.apply(context, args);
+          lastRan = Date.now();
+        }
+      }, limit - (Date.now() - lastRan));
+    }
+  };
+}
+
+// Section switching with history API support
+function showSection(sectionId) {
+  // Update URL without reload
+  history.pushState({ section: sectionId }, '', `#${sectionId}`);
+  
+  // Hide all sections
+  document.querySelectorAll('.section').forEach(section => {
+    section.classList.add('hidden');
+    section.classList.remove('fade-in');
+  });
+  
+  // Show target section
+  const targetSection = document.getElementById(sectionId);
+  if (targetSection) {
+    targetSection.classList.remove('hidden');
+    targetSection.classList.add('fade-in');
+  }
+  
+  // Update active sidebar link
+  document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+  const activeLink = document.querySelector(`[data-target="${sectionId}"]`);
+  if (activeLink) activeLink.classList.add('active');
+  
+  // Update page title
+  const titles = {
+    dashboard: 'Dashboard Overview',
+    products: 'Products Management',
+    orders: 'Orders Management',
+    users: 'User Management',
+    categories: 'Categories & Tags',
+    reviews: 'Customer Reviews',
+    'ar-models': 'AR Models',
+    analytics: 'Analytics Dashboard',
+    'sales-reports': 'Sales & Reports',
+    settings: 'Settings',
+    shop: 'Shop Configuration'
+  };
+  document.getElementById('page-title').textContent = titles[sectionId] || 'Dashboard';
+  
+  // Update app state
+  appState.currentSection = sectionId;
+  
+  // Load section data with debounce
+  debouncedLoadSectionData(sectionId);
+  
+  // Close mobile sidebar if open
+  if (appState.isSidebarOpen) {
+    toggleSidebar();
+  }
+}
+
+// Debounced section data loading
+const debouncedLoadSectionData = debounce(loadSectionData, 300);
+
+// Section data loading with error handling
+function loadSectionData(sectionId) {
+  try {
+    switch (sectionId) {
+      case 'dashboard': loadDashboard(); break;
+      case 'products': loadProducts(); break;
+      case 'orders': loadOrders(); break;
+      case 'users': loadUsers(); break;
+      case 'categories': loadCategories(); break;
+      case 'reviews': loadReviews(); break;
+      case 'ar-models': loadARModels(); break;
+      case 'analytics': loadAnalytics(); break;
+      case 'sales-reports': loadSalesReports(); break;
+      default: break;
+    }
+  } catch (error) {
+    console.error(`Error loading section ${sectionId}:`, error);
+    // Show error message to user
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.innerHTML = `
+        <div class="p-6 bg-red-50 rounded-lg text-red-800">
+          <h3 class="text-lg font-semibold mb-2">Error Loading Content</h3>
+          <p>There was an error loading the ${sectionId} content. Please try refreshing the page.</p>
+          <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-red-100 hover:bg-red-200 rounded-lg">
+            Refresh Page
+          </button>
+        </div>
+      `;
+    }
+  }
+}
+
+// Dashboard with enhanced metrics
+function loadDashboard() {
+  // Update stats cards
+  document.getElementById('total-users').textContent = appState.data.stats.totalUsers.toLocaleString();
+  document.getElementById('total-sales').textContent = formatCurrency(appState.data.stats.totalSales);
+  document.getElementById('total-products').textContent = appState.data.stats.totalProducts.toLocaleString();
+  document.getElementById('ar-tries').textContent = appState.data.stats.arTries.toLocaleString();
+  
+  // Add more stats cards if needed
+  const statsContainer = document.querySelector('#dashboard .grid-cols-4');
+  if (statsContainer) {
+    statsContainer.innerHTML += `
+      <div class="stats-card bg-gradient-to-r from-pink-600 to-pink-800 text-white rounded-xl shadow-lg p-6 hover-scale cursor-pointer" data-stats="conversion">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-semibold opacity-90">Conversion Rate</h3>
+            <span class="text-3xl font-bold">${appState.data.stats.conversionRate}%</span>
+            <p class="text-sm opacity-75">${appState.data.stats.newUsers} new users</p>
+          </div>
+          <i class="fas fa-percentage text-4xl opacity-50"></i>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Recent orders
+  const recentOrders = appState.data.orders
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 5)
+    .map(order => `
+      <div class="flex items-center justify-between p-3 bg-white rounded-lg border hover:bg-gray-50 transition cursor-pointer" onclick="showOrderDetails('${order.id}')">
+        <div>
+          <p class="font-medium text-gray-800">${order.id}</p>
+          <p class="text-sm text-gray-600">${order.customer}</p>
+        </div>
+        <div class="text-right">
+          <p class="font-medium text-gray-800">${formatCurrency(order.total)}</p>
+          <span class="px-2 py-1 text-xs rounded-full ${getStatusClasses(order.status)}">${order.status}</span>
+        </div>
+      </div>
+    `).join('');
+  document.getElementById('recent-orders').innerHTML = recentOrders || '<p class="text-gray-500">No recent orders</p>';
+  
+  // Top products
+  const topProducts = appState.data.products
+    .sort((a, b) => b.sales - a.sales)
+    .slice(0, 5)
+    .map(product => `
+      <div class="flex items-center justify-between p-3 bg-white rounded-lg border hover:bg-gray-50 transition cursor-pointer" onclick="showProductDetails(${product.id})">
+        <div class="flex items-center gap-3">
+          <img src="${product.image}" alt="${product.name}" class="w-12 h-12 rounded-lg object-cover">
+          <div>
+            <p class="font-medium text-gray-800">${product.name}</p>
+            <p class="text-sm text-gray-600">${product.sales} sales • ${product.rating}★</p>
+          </div>
+        </div>
+        <p class="font-medium text-gray-800">${formatCurrency(product.price)}</p>
+      </div>
+    `).join('');
+  document.getElementById('top-products').innerHTML = topProducts || '<p class="text-gray-500">No products found</p>';
+  
+  // Initialize mini charts if they don't exist
+  initMiniCharts();
+}
+
+// Products management with search, filter, sort, and pagination
+function loadProducts() {
+  // Apply filters
+  let filteredProducts = [...appState.data.products];
+  
+  // Category filter
+  if (appState.filters.products.category) {
+    filteredProducts = filteredProducts.filter(p => 
+      p.category === appState.filters.products.category
+    );
+  }
+  
+  // Status filter
+  if (appState.filters.products.status) {
+    filteredProducts = filteredProducts.filter(p => 
+      p.status === appState.filters.products.status
+    );
+  }
+  
+  // Search filter
+  if (appState.filters.products.search) {
+    const searchTerm = appState.filters.products.search.toLowerCase();
+    filteredProducts = filteredProducts.filter(p => 
+      p.name.toLowerCase().includes(searchTerm) || 
+      p.description.toLowerCase().includes(searchTerm) ||
+      p.sku.toLowerCase().includes(searchTerm)
+    );
+  }
+  
+  // Sort products
+  filteredProducts.sort((a, b) => {
+    const field = appState.sort.products.field;
+    const direction = appState.sort.products.direction === 'asc' ? 1 : -1;
+    
+    if (a[field] < b[field]) return -1 * direction;
+    if (a[field] > b[field]) return 1 * direction;
+    return 0;
+  });
+  
+  // Update pagination
+  appState.pagination.products.total = filteredProducts.length;
+  const startIdx = (appState.pagination.products.page - 1) * appState.pagination.products.perPage;
+  const paginatedProducts = filteredProducts.slice(
+    startIdx, 
+    startIdx + appState.pagination.products.perPage
+  );
+  
+  // Render products grid
+  const productsGrid = document.getElementById('products-grid');
+  if (productsGrid) {
+    if (paginatedProducts.length === 0) {
+      productsGrid.innerHTML = `
+        <div class="col-span-full text-center py-12">
+          <i class="fas fa-box-open text-4xl text-gray-400 mb-4"></i>
+          <h4 class="text-lg font-medium text-gray-600">No products found</h4>
+          <p class="text-gray-500">Try adjusting your filters or add a new product</p>
+        </div>
+      `;
+    } else {
+      productsGrid.innerHTML = paginatedProducts.map(product => `
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+          <div class="relative">
+            <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover">
+            <span class="absolute top-2 right-2 px-2 py-1 text-xs rounded-full ${getStatusClasses(product.status)}">
+              ${product.status}
+            </span>
+          </div>
+          <div class="p-4">
+            <div class="flex justify-between items-start mb-2">
+              <h3 class="font-semibold text-gray-800 truncate">${product.name}</h3>
+              <span class="font-medium text-gray-800">${formatCurrency(product.price)}</span>
+            </div>
+            <p class="text-sm text-gray-600 mb-3 line-clamp-2">${product.description}</p>
+            <div class="flex justify-between items-center text-sm">
+              <span class="text-gray-500">${product.category}</span>
+              <span class="${product.stock <= 5 ? 'text-red-500' : 'text-gray-500'}">
+                ${product.stock} in stock
+              </span>
+            </div>
+            <div class="mt-4 flex gap-2">
+              <button onclick="editProduct(${product.id})" class="flex-1 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition">
+                <i class="fas fa-edit mr-1"></i> Edit
+              </button>
+              <button onclick="confirmDelete('product', ${product.id})" class="flex-1 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition">
+                <i class="fas fa-trash mr-1"></i> Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+  
+  // Render pagination controls
+  renderPagination('products');
+  
+  // Initialize category filter dropdown
+  const categoryFilter = document.getElementById('product-category-filter');
+  if (categoryFilter && categoryFilter.options.length <= 1) {
+    const categories = [...new Set(appState.data.products.map(p => p.category))].sort();
+    categories.forEach(category => {
+      const option = document.createElement('option');
+      option.value = category;
+      option.textContent = category;
+      categoryFilter.appendChild(option);
+    });
+  }
+}
+
+// Orders management with enhanced features
+function loadOrders() {
+  // Apply filters
+  let filteredOrders = [...appState.data.orders];
+  
+  // Status filter
+  if (appState.filters.orders.status) {
+    filteredOrders = filteredOrders.filter(o => 
+      o.status === appState.filters.orders.status
+    );
+  }
+  
+  // Date range filter
+  if (appState.filters.orders.dateFrom && appState.filters.orders.dateTo) {
+    filteredOrders = filteredOrders.filter(o => {
+      const orderDate = new Date(o.date);
+      return orderDate >= new Date(appState.filters.orders.dateFrom) && 
+             orderDate <= new Date(appState.filters.orders.dateTo);
+    });
+  }
+  
+  // Search filter
+  if (appState.filters.orders.search) {
+    const searchTerm = appState.filters.orders.search.toLowerCase();
+    filteredOrders = filteredOrders.filter(o => 
+      o.id.toLowerCase().includes(searchTerm) || 
+      o.customer.toLowerCase().includes(searchTerm) ||
+      o.customerEmail.toLowerCase().includes(searchTerm)
+    );
+  }
+  
+  // Sort orders
+  filteredOrders.sort((a, b) => {
+    const field = appState.sort.orders.field;
+    const direction = appState.sort.orders.direction === 'asc' ? 1 : -1;
+    
+    if (a[field] < b[field]) return -1 * direction;
+    if (a[field] > b[field]) return 1 * direction;
+    return 0;
+  });
+  
+  // Update pagination
+  appState.pagination.orders.total = filteredOrders.length;
+  const startIdx = (appState.pagination.orders.page - 1) * appState.pagination.orders.perPage;
+  const paginatedOrders = filteredOrders.slice(
+    startIdx, 
+    startIdx + appState.pagination.orders.perPage
+  );
+  
+  // Render orders table
+  const ordersTableBody = document.getElementById('orders-table-body');
+  if (ordersTableBody) {
+    if (paginatedOrders.length === 0) {
+      ordersTableBody.innerHTML = `
+        <tr>
+          <td colspan="7" class="text-center py-8 text-gray-500">
+            <i class="fas fa-shopping-cart text-3xl mb-2"></i>
+            <p>No orders found matching your criteria</p>
+          </td>
+        </tr>
+      `;
+    } else {
+      ordersTableBody.innerHTML = paginatedOrders.map(order => `
+        <tr class="hover:bg-gray-50">
+          <td class="border border-gray-300 px-4 py-3">${order.id}</td>
+          <td class="border border-gray-300 px-4 py-3">
+            <div>
+              <p class="font-medium">${order.customer}</p>
+              <p class="text-sm text-gray-600">${order.customerEmail}</p>
+            </div>
+          </td>
+          <td class="border border-gray-300 px-4 py-3">
+            <div class="flex flex-wrap gap-1">
+              ${order.products.slice(0, 3).map(p => `
+                <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">${p}</span>
+              `).join('')}
+              ${order.products.length > 3 ? `<span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">+${order.products.length - 3} more</span>` : ''}
+            </div>
+          </td>
+          <td class="border border-gray-300 px-4 py-3">
+            <span class="px-2 py-1 rounded-full text-xs ${getStatusClasses(order.status)}">${order.status}</span>
+          </td>
+          <td class="border border-gray-300 px-4 py-3 font-medium">${formatCurrency(order.total)}</td>
+          <td class="border border-gray-300 px-4 py-3">${formatDate(order.date)}</td>
+          <td class="border border-gray-300 px-4 py-3">
+            <div class="flex gap-2">
+              <button onclick="showOrderDetails('${order.id}')" class="p-1 text-blue-600 hover:text-blue-800">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button onclick="editOrderStatus('${order.id}')" class="p-1 text-green-600 hover:text-green-800">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button onclick="confirmDelete('order', '${order.id}')" class="p-1 text-red-600 hover:text-red-800">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+  }
+  
+  // Render pagination controls
+  renderPagination('orders');
+}
+
+// Users management with enhanced features
+function loadUsers() {
+  // Apply filters
+  let filteredUsers = [...appState.data.users];
+  
+  // Role filter
+  if (appState.filters.users.role) {
+    filteredUsers = filteredUsers.filter(u => 
+      u.role === appState.filters.users.role
+    );
+  }
+  
+  // Status filter
+  if (appState.filters.users.status) {
+    filteredUsers = filteredUsers.filter(u => 
+      u.status === appState.filters.users.status
+    );
+  }
+  
+  // Search filter
+  if (appState.filters.users.search) {
+    const searchTerm = appState.filters.users.search.toLowerCase();
+    filteredUsers = filteredUsers.filter(u => 
+      u.firstName.toLowerCase().includes(searchTerm) || 
+      u.lastName.toLowerCase().includes(searchTerm) ||
+      u.email.toLowerCase().includes(searchTerm)
+    );
+  }
+  
+  // Sort users
+  filteredUsers.sort((a, b) => {
+    const field = appState.sort.users.field;
+    const direction = appState.sort.users.direction === 'asc' ? 1 : -1;
+    
+    if (a[field] < b[field]) return -1 * direction;
+    if (a[field] > b[field]) return 1 * direction;
+    return 0;
+  });
+  
+  // Update pagination
+  appState.pagination.users.total = filteredUsers.length;
+  const startIdx = (appState.pagination.users.page - 1) * appState.pagination.users.perPage;
+  const paginatedUsers = filteredUsers.slice(
+    startIdx, 
+    startIdx + appState.pagination.users.perPage
+  );
+  
+  // Render users grid
+  const usersGrid = document.getElementById('users-grid');
+  if (usersGrid) {
+    if (paginatedUsers.length === 0) {
+      usersGrid.innerHTML = `
+        <div class="col-span-full text-center py-12">
+          <i class="fas fa-user-slash text-4xl text-gray-400 mb-4"></i>
+          <h4 class="text-lg font-medium text-gray-600">No users found</h4>
+          <p class="text-gray-500">Try adjusting your filters or add a new user</p>
+        </div>
+      `;
+    } else {
+      usersGrid.innerHTML = paginatedUsers.map(user => `
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+          <div class="p-4">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center text-white font-semibold">
+                ${user.firstName.charAt(0)}${user.lastName.charAt(0)}
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-800">${user.firstName} ${user.lastName}</h3>
+                <p class="text-sm text-gray-600 truncate">${user.email}</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-sm mb-4">
+              <div>
+                <p class="text-gray-500">Role</p>
+                <p class="font-medium capitalize">${user.role}</p>
+              </div>
+              <div>
+                <p class="text-gray-500">Status</p>
+                <p class="font-medium">
+                  <span class="px-2 py-1 rounded-full text-xs ${getStatusClasses(user.status)}">${user.status}</span>
+                </p>
+              </div>
+              <div>
+                <p class="text-gray-500">Orders</p>
+                <p class="font-medium">${user.totalOrders}</p>
+              </div>
+              <div>
+                <p class="text-gray-500">Spent</p>
+                <p class="font-medium">${formatCurrency(user.totalSpent)}</p>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="editUser(${user.id})" class="flex-1 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition">
+                <i class="fas fa-edit mr-1"></i> Edit
+              </button>
+              <button onclick="confirmDelete('user', ${user.id})" class="flex-1 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition">
+                <i class="fas fa-trash mr-1"></i> ${user.status === 'Suspended' ? 'Delete' : 'Suspend'}
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+  
+  // Render pagination controls
+  renderPagination('users');
+}
+
+// Categories management
+function loadCategories() {
+  const categoriesGrid = document.getElementById('categories-grid');
+  if (categoriesGrid) {
+    if (appState.data.categories.length === 0) {
+      categoriesGrid.innerHTML = `
+        <div class="col-span-full text-center py-12">
+          <i class="fas fa-tags text-4xl text-gray-400 mb-4"></i>
+          <h4 class="text-lg font-medium text-gray-600">No categories found</h4>
+          <p class="text-gray-500">Create your first category to organize products</p>
+        </div>
+      `;
+    } else {
+      categoriesGrid.innerHTML = appState.data.categories.map(category => `
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+          <div class="relative h-40 bg-gray-100">
+            <img src="${category.image}" alt="${category.name}" class="w-full h-full object-cover">
+            <span class="absolute top-2 right-2 px-2 py-1 text-xs rounded-full ${getStatusClasses(category.status)}">
+              ${category.status}
+            </span>
+          </div>
+          <div class="p-4">
+            <h3 class="font-semibold text-gray-800 mb-1">${category.name}</h3>
+            <p class="text-sm text-gray-600 mb-3 line-clamp-2">${category.description}</p>
+            <div class="flex justify-between items-center text-sm">
+              <span class="text-gray-500">${category.productCount} products</span>
+              <div class="flex gap-2">
+                <button onclick="editCategory(${category.id})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-full">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="confirmDelete('category', ${category.id})" class="p-2 text-red-600 hover:bg-red-50 rounded-full">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+}
+
+// Reviews management
+function loadReviews() {
+  // Apply filters
+  let filteredReviews = [...appState.data.reviews];
+  
+  // Rating filter
+  if (appState.filters.reviews.rating) {
+    filteredReviews = filteredReviews.filter(r => 
+      r.rating === parseInt(appState.filters.reviews.rating)
+    );
+  }
+  
+  // Sort reviews
+  filteredReviews.sort((a, b) => {
+    const field = appState.sort.reviews.field;
+    const direction = appState.sort.reviews.direction === 'asc' ? 1 : -1;
+    
+    if (a[field] < b[field]) return -1 * direction;
+    if (a[field] > b[field]) return 1 * direction;
+    return 0;
+  });
+  
+  // Update pagination
+  appState.pagination.reviews.total = filteredReviews.length;
+  const startIdx = (appState.pagination.reviews.page - 1) * appState.pagination.reviews.perPage;
+  const paginatedReviews = filteredReviews.slice(
+    startIdx, 
+    startIdx + appState.pagination.reviews.perPage
+  );
+  
+  // Render reviews list
+  const reviewsList = document.getElementById('reviews-list');
+  if (reviewsList) {
+    if (paginatedReviews.length === 0) {
+      reviewsList.innerHTML = `
+        <div class="text-center py-12 text-gray-500">
+          <i class="fas fa-star text-4xl mb-4"></i>
+          <h4 class="text-lg font-medium">No reviews found</h4>
+          <p>Try adjusting your filters</p>
+        </div>
+      `;
+    } else {
+      reviewsList.innerHTML = paginatedReviews.map(review => `
+        <div class="bg-white rounded-xl shadow p-4">
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <h4 class="font-medium text-gray-800">${review.product}</h4>
+              <p class="text-sm text-gray-600">by ${review.customer}</p>
+            </div>
+            <div class="flex items-center">
+              ${Array.from({ length: 5 }, (_, i) => `
+                <i class="fas fa-star ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}"></i>
+              `).join('')}
+            </div>
+          </div>
+          <p class="text-gray-700 mb-3">${review.comment}</p>
+          ${review.images.length > 0 ? `
+            <div class="flex gap-2 mb-3">
+              ${review.images.map(img => `
+                <img src="${img}" alt="Review image" class="w-16 h-16 rounded-lg object-cover">
+              `).join('')}
+            </div>
+          ` : ''}
+          <div class="flex justify-between items-center text-sm">
+            <span class="text-gray-500">${formatDate(review.date)}</span>
+            <div class="flex gap-3">
+              <button class="text-gray-500 hover:text-blue-600">
+                <i class="fas fa-thumbs-up mr-1"></i> Helpful (${review.helpful})
+              </button>
+              <button onclick="confirmDelete('review', ${review.id})" class="text-gray-500 hover:text-red-600">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+  
+  // Render pagination controls
+  renderPagination('reviews');
+}
+
+// AR Models management
+function loadARModels() {
+  // Apply filters
+  let filteredModels = [...appState.data.arModels];
+  
+  // Status filter
+  if (appState.filters.arModels.status) {
+    filteredModels = filteredModels.filter(m => 
+      m.status === appState.filters.arModels.status
+    );
+  }
+  
+  // Sort models
+  filteredModels.sort((a, b) => {
+    const field = appState.sort.arModels.field;
+    const direction = appState.sort.arModels.direction === 'asc' ? 1 : -1;
+    
+    if (a[field] < b[field]) return -1 * direction;
+    if (a[field] > b[field]) return 1 * direction;
+    return 0;
+  });
+  
+  // Update pagination
+  appState.pagination.arModels.total = filteredModels.length;
+  const startIdx = (appState.pagination.arModels.page - 1) * appState.pagination.arModels.perPage;
+  const paginatedModels = filteredModels.slice(
+    startIdx, 
+    startIdx + appState.pagination.arModels.perPage
+  );
+  
+  // Render AR models grid
+  const modelsGrid = document.getElementById('ar-models-grid');
+  if (modelsGrid) {
+    if (paginatedModels.length === 0) {
+      modelsGrid.innerHTML = `
+        <div class="col-span-full text-center py-12">
+          <i class="fas fa-cube text-4xl text-gray-400 mb-4"></i>
+          <h4 class="text-lg font-medium text-gray-600">No AR models found</h4>
+          <p class="text-gray-500">Create your first AR model to enhance product visualization</p>
+        </div>
+      `;
+    } else {
+      modelsGrid.innerHTML = paginatedModels.map(model => `
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+          <div class="relative h-40 bg-gray-100">
+            <img src="${model.previewImage}" alt="${model.name}" class="w-full h-full object-cover">
+            <span class="absolute top-2 right-2 px-2 py-1 text-xs rounded-full ${getStatusClasses(model.status)}">
+              ${model.status}
+            </span>
+          </div>
+          <div class="p-4">
+            <h3 class="font-semibold text-gray-800 mb-1">${model.name}</h3>
+            <p class="text-sm text-gray-600 mb-3">For: ${model.product}</p>
+            <div class="grid grid-cols-2 gap-2 text-sm mb-4">
+              <div>
+                <p class="text-gray-500">File Size</p>
+                <p class="font-medium">${model.fileSize}</p>
+              </div>
+              <div>
+                <p class="text-gray-500">Tries</p>
+                <p class="font-medium">${model.tries}</p>
+              </div>
+              <div>
+                <p class="text-gray-500">Updated</p>
+                <p class="font-medium">${formatDate(model.lastUpdated)}</p>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="previewARModel(${model.id})" class="flex-1 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition">
+                <i class="fas fa-eye mr-1"></i> Preview
+              </button>
+              <button onclick="confirmDelete('ar-model', ${model.id})" class="flex-1 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition">
+                <i class="fas fa-trash mr-1"></i> Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+  
+  // Render pagination controls
+  renderPagination('arModels');
+}
+
+// Analytics with Chart.js
+function loadAnalytics() {
+  // Initialize charts if they don't exist
+  initCharts();
+  
+  // Update charts data based on timeframe
+  updateCharts();
+}
+
+// Sales reports with enhanced data
+function loadSalesReports() {
+  // Update sales summary cards
+  const today = new Date().toISOString().split('T')[0];
+  const todaySales = appState.data.orders
+    .filter(o => o.date === today && o.status !== 'Cancelled')
+    .reduce((sum, o) => sum + o.total, 0);
+  
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const weekSales = appState.data.orders
+    .filter(o => o.date >= weekAgo && o.status !== 'Cancelled')
+    .reduce((sum, o) => sum + o.total, 0);
+  
+  const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const monthSales = appState.data.orders
+    .filter(o => o.date >= monthAgo && o.status !== 'Cancelled')
+    .reduce((sum, o) => sum + o.total, 0);
+  
+  const avgOrder = appState.data.orders.length > 0 ? 
+    appState.data.orders.reduce((sum, o) => sum + o.total, 0) / appState.data.orders.length : 0;
+  
+  document.getElementById('today-sales').textContent = formatCurrency(todaySales);
+  document.getElementById('week-sales').textContent = formatCurrency(weekSales);
+  document.getElementById('month-sales').textContent = formatCurrency(monthSales);
+  document.getElementById('avg-order').textContent = formatCurrency(avgOrder);
+  
+  // Initialize sales charts if they don't exist
+  initSalesCharts();
+  
+  // Best selling products
+  const bestSelling = appState.data.products
+    .sort((a, b) => b.sales - a.sales)
+    .slice(0, 5);
+  
+  const bestSellingContainer = document.getElementById('best-selling-products');
+  if (bestSellingContainer) {
+    bestSellingContainer.innerHTML = bestSelling.map((product, i) => `
+      <div class="flex items-center justify-between p-3 bg-white rounded-lg border">
+        <div class="flex items-center gap-3">
+          <span class="w-6 h-6 flex items-center justify-center bg-gray-100 rounded-full text-sm font-medium">${i + 1}</span>
+          <img src="${product.image}" alt="${product.name}" class="w-10 h-10 rounded-lg object-cover">
+          <div>
+            <p class="font-medium text-gray-800">${product.name}</p>
+            <p class="text-sm text-gray-600">${product.category}</p>
+          </div>
+        </div>
+        <div class="text-right">
+          <p class="font-medium text-gray-800">${product.sales} sales</p>
+          <p class="text-sm text-gray-600">${formatCurrency(product.sales * product.price)}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+// Initialize Chart.js charts
+function initCharts() {
+  // Visitors Chart
+  const visitorsCtx = document.getElementById('visitorsChart');
+  if (visitorsCtx && !visitorsCtx.chart) {
+    visitorsCtx.chart = new Chart(visitorsCtx, {
+      type: 'line',
+      data: { labels: [], datasets: [] },
+      options: getChartOptions('Visitors')
+    });
+  }
+  
+  // Sales Chart
+  const salesCtx = document.getElementById('salesChart');
+  if (salesCtx && !salesCtx.chart) {
+    salesCtx.chart = new Chart(salesCtx, {
+      type: 'bar',
+      data: { labels: [], datasets: [] },
+      options: getChartOptions('Sales', true)
+    });
+  }
+  
+  // AR Tries Chart
+  const arTriesCtx = document.getElementById('arTriesChart');
+  if (arTriesCtx && !arTriesCtx.chart) {
+    arTriesCtx.chart = new Chart(arTriesCtx, {
+      type: 'line',
+      data: { labels: [], datasets: [] },
+      options: getChartOptions('AR Tries')
+    });
+  }
+  
+  // Category Chart
+  const categoryCtx = document.getElementById('categoryChart');
+  if (categoryCtx && !categoryCtx.chart) {
+    categoryCtx.chart = new Chart(categoryCtx, {
+      type: 'doughnut',
+      data: { labels: [], datasets: [] },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'right' },
+          title: { display: false }
+        }
+      }
+    });
+  }
+  
+  // Demographics Chart
+  const demographicsCtx = document.getElementById('demographicsChart');
+  if (demographicsCtx && !demographicsCtx.chart) {
+    demographicsCtx.chart = new Chart(demographicsCtx, {
+      type: 'pie',
+      data: { labels: [], datasets: [] },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'right' },
+          title: { display: false }
+        }
+      }
+    });
+  }
+}
+
+// Initialize sales charts
+function initSalesCharts() {
+  // Category Revenue Chart
+  const categoryRevenueCtx = document.getElementById('categoryRevenueChart');
+  if (categoryRevenueCtx && !categoryRevenueCtx.chart) {
+    categoryRevenueCtx.chart = new Chart(categoryRevenueCtx, {
+      type: 'bar',
+      data: { labels: [], datasets: [] },
+      options: getChartOptions('Revenue by Category')
+    });
+  }
+  
+  // Sales Trend Chart
+  const salesTrendCtx = document.getElementById('salesTrendChart');
+  if (salesTrendCtx && !salesTrendCtx.chart) {
+    salesTrendCtx.chart = new Chart(salesTrendCtx, {
+      type: 'line',
+      data: { labels: [], datasets: [] },
+      options: getChartOptions('Sales Trend', true)
+    });
+  }
+  
+  // Update sales charts data
+  updateSalesCharts();
+}
+
+// Initialize mini charts for dashboard
+function initMiniCharts() {
+  // Mini chart for user growth
+  const userGrowthCtx = document.createElement('canvas');
+  userGrowthCtx.style.maxWidth = '100%';
+  userGrowthCtx.style.height = '60px';
+  
+  const userGrowthChart = new Chart(userGrowthCtx, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [{
+        data: [120, 190, 170, 220, 240, 280],
+        borderColor: '#ffffff',
+        borderWidth: 2,
+        tension: 0.4,
+        fill: false,
+        pointRadius: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { x: { display: false }, y: { display: false } }
+    }
+  });
+  
+  // Add to total users card
+  const usersCard = document.querySelector('[data-stats="users"]');
+  if (usersCard) {
+    usersCard.querySelector('div > div').appendChild(userGrowthCtx);
+  }
+  
+  // Repeat for other cards...
+}
+
+// Common chart options
+function getChartOptions(title, currency = false) {
+  return {
+    responsive: true,
+    plugins: {
+      legend: { position: 'top' },
+      title: { 
+        display: !!title,
+        text: title,
+        font: { size: 16 }
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            let label = context.dataset.label || '';
+            if (label) label += ': ';
+            if (currency) {
+              label += formatCurrency(context.raw);
+            } else {
+              label += context.raw.toLocaleString();
+            }
+            return label;
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: function(value) {
+            if (currency) return formatCurrency(value);
+            return value.toLocaleString();
+          }
+        }
+      }
+    }
+  };
+}
+
+// Update charts data based on timeframe
+function updateCharts() {
+  const timeframe = document.getElementById('chart-timeframe').value;
+  let labels = [];
+  let days = 30;
+  
+  if (timeframe === '7d') days = 7;
+  else if (timeframe === '90d') days = 90;
+  else if (timeframe === '1y') days = 365;
+  
+  // Generate labels based on timeframe
+  const now = new Date();
+  for (let i = days - 1; i >= 0; i--) {
+    const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+    labels.push(date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+  }
+  
+  // Generate random data for demo purposes
+  const visitorsData = Array.from({ length: days }, () => Math.floor(Math.random() * 1000) + 500);
+  const salesData = Array.from({ length: days }, () => Math.floor(Math.random() * 10000) + 2000);
+  const arTriesData = Array.from({ length: days }, () => Math.floor(Math.random() * 500) + 100);
+  
+  // Category data
+  const categories = [...new Set(appState.data.products.map(p => p.category))];
+  const categoryData = categories.map(cat => 
+    appState.data.products.filter(p => p.category === cat).length
+  );
+  
+  // Demographics data (mock)
+  const demographicsLabels = ['18-24', '25-34', '35-44', '45-54', '55+'];
+  const demographicsData = demographicsLabels.map(() => Math.floor(Math.random() * 30) + 10);
+  
+  // Update visitors chart
+  const visitorsCtx = document.getElementById('visitorsChart');
+  if (visitorsCtx?.chart) {
+    visitorsCtx.chart.data.labels = labels;
+    visitorsCtx.chart.data.datasets = [{
+      label: 'Visitors',
+      data: visitorsData,
+      borderColor: '#667eea',
+      backgroundColor: 'rgba(102, 126, 234, 0.1)',
+      borderWidth: 2,
+      tension: 0.4,
+      fill: true
+    }];
+    visitorsCtx.chart.update();
+  }
+  
+  // Update sales chart
+  const salesCtx = document.getElementById('salesChart');
+  if (salesCtx?.chart) {
+    salesCtx.chart.data.labels = labels;
+    salesCtx.chart.data.datasets = [{
+      label: 'Sales',
+      data: salesData,
+      backgroundColor: '#10b981',
+      borderColor: '#10b981',
+      borderWidth: 1
+    }];
+    salesCtx.chart.update();
+  }
+  
+  // Update AR tries chart
+  const arTriesCtx = document.getElementById('arTriesChart');
+  if (arTriesCtx?.chart) {
+    arTriesCtx.chart.data.labels = labels;
+    arTriesCtx.chart.data.datasets = [{
+      label: 'AR Tries',
+      data: arTriesData,
+      borderColor: '#f59e0b',
+      backgroundColor: 'rgba(245, 158, 11, 0.1)',
+      borderWidth: 2,
+      tension: 0.4,
+      fill: true
+    }];
+    arTriesCtx.chart.update();
+  }
+  
+  // Update category chart
+  const categoryCtx = document.getElementById('categoryChart');
+  if (categoryCtx?.chart) {
+    categoryCtx.chart.data.labels = categories;
+    categoryCtx.chart.data.datasets = [{
+      data: categoryData,
+      backgroundColor: ['#667eea', '#764ba2', '#6b46c1', '#553c9a', '#44337a']
+    }];
+    categoryCtx.chart.update();
+  }
+  
+  // Update demographics chart
+  const demographicsCtx = document.getElementById('demographicsChart');
+  if (demographicsCtx?.chart) {
+    demographicsCtx.chart.data.labels = demographicsLabels;
+    demographicsCtx.chart.data.datasets = [{
+      data: demographicsData,
+      backgroundColor: ['#4299e1', '#38b2ac', '#f6ad55', '#f687b3', '#a0aec0']
+    }];
+    demographicsCtx.chart.update();
+  }
+}
+
+// Update sales charts data
+function updateSalesCharts() {
+  // Category revenue data
+  const categories = [...new Set(appState.data.products.map(p => p.category))];
+  const categoryRevenueData = categories.map(cat => {
+    const productsInCat = appState.data.products.filter(p => p.category === cat);
+    return productsInCat.reduce((sum, p) => sum + (p.sales * p.price), 0);
+  });
+  
+  // Sales trend data (last 30 days)
+  const now = new Date();
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const salesTrendLabels = [];
+  const salesTrendData = [];
+  
+  for (let i = 0; i < 30; i++) {
+    const date = new Date(thirtyDaysAgo.getTime() + i * 24 * 60 * 60 * 1000);
+    const dateStr = date.toISOString().split('T')[0];
+    salesTrendLabels.push(date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+    
+    const dailySales = appState.data.orders
+      .filter(o => o.date === dateStr && o.status !== 'Cancelled')
+      .reduce((sum, o) => sum + o.total, 0);
+    
+    salesTrendData.push(dailySales);
+  }
+  
+  // Update category revenue chart
+  const categoryRevenueCtx = document.getElementById('categoryRevenueChart');
+  if (categoryRevenueCtx?.chart) {
+    categoryRevenueCtx.chart.data.labels = categories;
+    categoryRevenueCtx.chart.data.datasets = [{
+      label: 'Revenue',
+      data: categoryRevenueData,
+      backgroundColor: ['#667eea', '#764ba2', '#6b46c1', '#553c9a', '#44337a']
+    }];
+    categoryRevenueCtx.chart.update();
+  }
+  
+  // Update sales trend chart
+  const salesTrendCtx = document.getElementById('salesTrendChart');
+  if (salesTrendCtx?.chart) {
+    salesTrendCtx.chart.data.labels = salesTrendLabels;
+    salesTrendCtx.chart.data.datasets = [{
+      label: 'Sales',
+      data: salesTrendData,
+      borderColor: '#10b981',
+      backgroundColor: 'rgba(16, 185, 129, 0.1)',
+      borderWidth: 2,
+      tension: 0.4,
+      fill: true
+    }];
+    salesTrendCtx.chart.update();
+  }
+}
+
+// Render pagination controls
+function renderPagination(type) {
+  const pagination = appState.pagination[type];
+  const totalPages = Math.ceil(pagination.total / pagination.perPage);
+  
+  const container = document.querySelector(`#${type} .pagination-container`);
+  if (!container) {
+    // Create container if it doesn't exist
+    const section = document.getElementById(type);
+    if (section) {
+      const newContainer = document.createElement('div');
+      newContainer.className = 'pagination-container mt-6 flex justify-between items-center';
+      section.appendChild(newContainer);
+      
+      // Add items per page selector
+      newContainer.innerHTML = `
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+          <span>Items per page:</span>
+          <select onchange="changeItemsPerPage('${type}', this.value)" class="border rounded px-2 py-1">
+            <option value="10" ${pagination.perPage === 10 ? 'selected' : ''}>10</option>
+            <option value="25" ${pagination.perPage === 25 ? 'selected' : ''}>25</option>
+            <option value="50" ${pagination.perPage === 50 ? 'selected' : ''}>50</option>
+            <option value="100" ${pagination.perPage === 100 ? 'selected' : ''}>100</option>
+          </select>
+        </div>
+        <div class="flex gap-1">
+          <button onclick="changePage('${type}', 1)" class="px-3 py-1 border rounded ${pagination.page === 1 ? 'bg-gray-100 cursor-not-allowed' : 'hover:bg-gray-50'}">
+            <i class="fas fa-angle-double-left"></i>
+          </button>
+          <button onclick="changePage('${type}', ${pagination.page - 1})" 
+            class="px-3 py-1 border rounded ${pagination.page === 1 ? 'bg-gray-100 cursor-not-allowed' : 'hover:bg-gray-50'}">
+            <i class="fas fa-angle-left"></i>
+          </button>
+          
+          ${Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+            let pageNum;
+            if (totalPages <= 5) {
+              pageNum = i + 1;
+            } else if (pagination.page <= 3) {
+              pageNum = i + 1;
+            } else if (pagination.page >= totalPages - 2) {
+              pageNum = totalPages - 4 + i;
+            } else {
+              pageNum = pagination.page - 2 + i;
+            }
+            
+            return `
+              <button onclick="changePage('${type}', ${pageNum})" 
+                class="px-3 py-1 border rounded ${pagination.page === pageNum ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-50'}">
+                ${pageNum}
+              </button>
+            `;
+          }).join('')}
+          
+          <button onclick="changePage('${type}', ${pagination.page + 1})" 
+            class="px-3 py-1 border rounded ${pagination.page === totalPages ? 'bg-gray-100 cursor-not-allowed' : 'hover:bg-gray-50'}">
+            <i class="fas fa-angle-right"></i>
+          </button>
+          <button onclick="changePage('${type}', ${totalPages})" 
+            class="px-3 py-1 border rounded ${pagination.page === totalPages ? 'bg-gray-100 cursor-not-allowed' : 'hover:bg-gray-50'}">
+            <i class="fas fa-angle-double-right"></i>
+          </button>
+        </div>
+        <div class="text-sm text-gray-600">
+          Showing ${(pagination.page - 1) * pagination.perPage + 1} to 
+          ${Math.min(pagination.page * pagination.perPage, pagination.total)} of 
+          ${pagination.total} items
+        </div>
+      `;
+    }
+  } else {
+    // Update existing container
+    container.innerHTML = `
+      <div class="flex items-center gap-2 text-sm text-gray-600">
+        <span>Items per page:</span>
+        <select onchange="changeItemsPerPage('${type}', this.value)" class="border rounded px-2 py-1">
+          <option value="10" ${pagination.perPage === 10 ? 'selected' : ''}>10</option>
+          <option value="25" ${pagination.perPage === 25 ? 'selected' : ''}>25</option>
+          <option value="50" ${pagination.perPage === 50 ? 'selected' : ''}>50</option>
+          <option value="100" ${pagination.perPage === 100 ? 'selected' : ''}>100</option>
+        </select>
+      </div>
+      <div class="flex gap-1">
+        <button onclick="changePage('${type}', 1)" class="px-3 py-1 border rounded ${pagination.page === 1 ? 'bg-gray-100 cursor-not-allowed' : 'hover:bg-gray-50'}">
+          <i class="fas fa-angle-double-left"></i>
+        </button>
+        <button onclick="changePage('${type}', ${pagination.page - 1})" 
+          class="px-3 py-1 border rounded ${pagination.page === 1 ? 'bg-gray-100 cursor-not-allowed' : 'hover:bg-gray-50'}">
+          <i class="fas fa-angle-left"></i>
+        </button>
+        
+        ${Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+          let pageNum;
+          if (totalPages <= 5) {
+            pageNum = i + 1;
+          } else if (pagination.page <= 3) {
+            pageNum = i + 1;
+          } else if (pagination.page >= totalPages - 2) {
+            pageNum = totalPages - 4 + i;
+          } else {
+            pageNum = pagination.page - 2 + i;
+          }
+          
+          return `
+            <button onclick="changePage('${type}', ${pageNum})" 
+              class="px-3 py-1 border rounded ${pagination.page === pageNum ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-50'}">
+              ${pageNum}
+            </button>
+          `;
+        }).join('')}
+        
+        <button onclick="changePage('${type}', ${pagination.page + 1})" 
+          class="px-3 py-1 border rounded ${pagination.page === totalPages ? 'bg-gray-100 cursor-not-allowed' : 'hover:bg-gray-50'}">
+          <i class="fas fa-angle-right"></i>
+        </button>
+        <button onclick="changePage('${type}', ${totalPages})" 
+          class="px-3 py-1 border rounded ${pagination.page === totalPages ? 'bg-gray-100 cursor-not-allowed' : 'hover:bg-gray-50'}">
+          <i class="fas fa-angle-double-right"></i>
+        </button>
+      </div>
+      <div class="text-sm text-gray-600">
+        Showing ${(pagination.page - 1) * pagination.perPage + 1} to 
+        ${Math.min(pagination.page * pagination.perPage, pagination.total)} of 
+        ${pagination.total} items
+      </div>
+    `;
+  }
+}
+
+// Change page function
+function changePage(type, page) {
+  const pagination = appState.pagination[type];
+  const totalPages = Math.ceil(pagination.total / pagination.perPage);
+  
+  if (page < 1 || page > totalPages || page === pagination.page) return;
+  
+  appState.pagination[type].page = page;
+  loadSectionData(type);
+  
+  // Scroll to top of section
+  const section = document.getElementById(type);
+  if (section) {
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+// Change items per page
+function changeItemsPerPage(type, perPage) {
+  appState.pagination[type].perPage = parseInt(perPage);
+  appState.pagination[type].page = 1; // Reset to first page
+  loadSectionData(type);
+}
+
+// Apply filter function
+function applyFilter(type, filterName, value) {
+  appState.filters[type][filterName] = value;
+  appState.pagination[type].page = 1; // Reset to first page
+  loadSectionData(type);
+}
+
+// Reset filters
+function resetFilters(type) {
+  appState.filters[type] = {};
+  appState.pagination[type].page = 1;
+  
+  // Reset filter inputs
+  const section = document.getElementById(type);
+  if (section) {
+    const inputs = section.querySelectorAll('input, select');
+    inputs.forEach(input => {
+      if (input.type === 'text' || input.type === 'search') {
+        input.value = '';
+      } else if (input.type === 'select-one') {
+        input.selectedIndex = 0;
+      } else if (input.type === 'date') {
+        input.value = '';
+      }
+    });
+  }
+  
+  loadSectionData(type);
+}
+
+// Toggle sidebar for mobile
+function toggleSidebar() {
+  if (window.innerWidth < 768) {
+    domElements.sidebar.classList.toggle('-translate-x-full');
+    domElements.overlay.classList.toggle('hidden');
+    appState.isSidebarOpen = !appState.isSidebarOpen;
+  }
+}
+
+// Toggle dark mode
+function toggleDarkMode() {
+  appState.darkMode = !appState.darkMode;
+  document.body.classList.toggle('dark-mode');
+  
+  // Update icon
+  const icon = domElements.themeToggle.querySelector('i');
+  if (appState.darkMode) {
+    icon.classList.replace('fa-moon', 'fa-sun');
+    domElements.themeToggle.querySelector('span').textContent = 'Light Mode';
+  } else {
+    icon.classList.replace('fa-sun', 'fa-moon');
+    domElements.themeToggle.querySelector('span').textContent = 'Dark Mode';
+  }
+  
+  // Save preference to localStorage
+  localStorage.setItem('darkMode', appState.darkMode);
+}
+
+// Toggle notifications dropdown
+function toggleNotifications() {
+  domElements.notificationsDropdown.classList.toggle('hidden');
+  
+  // Mark notifications as read when dropdown is opened
+  if (!domElements.notificationsDropdown.classList.contains('hidden')) {
+    appState.data.notifications.forEach(n => n.read = true);
+    updateNotificationBadge();
+  }
+  
+  // Close other dropdowns
+  domElements.profileDropdown.classList.add('hidden');
+}
+
+// Toggle profile dropdown
+function toggleProfile() {
+  domElements.profileDropdown.classList.toggle('hidden');
+  
+  // Close other dropdowns
+  domElements.notificationsDropdown.classList.add('hidden');
+}
+
+// Update notification badge
+function updateNotificationBadge() {
+  const unreadCount = appState.data.notifications.filter(n => !n.read).length;
+  const badge = domElements.notificationsBtn;
+  
+  if (unreadCount > 0) {
+    badge.classList.add('notification-badge');
+    badge.setAttribute('data-count', unreadCount);
+  } else {
+    badge.classList.remove('notification-badge');
+    badge.removeAttribute('data-count');
+  }
+}
+
+// Global search function
+function performGlobalSearch(query) {
+  if (!query.trim()) return;
+  
+  // Search across different data types
+  const results = {
+    products: appState.data.products.filter(p => 
+      p.name.toLowerCase().includes(query.toLowerCase()) || 
+      p.description.toLowerCase().includes(query.toLowerCase())
+    ).slice(0, 3),
+    orders: appState.data.orders.filter(o => 
+      o.id.toLowerCase().includes(query.toLowerCase()) || 
+      o.customer.toLowerCase().includes(query.toLowerCase())
+    ).slice(0, 3),
+    users: appState.data.users.filter(u => 
+      u.firstName.toLowerCase().includes(query.toLowerCase()) || 
+      u.lastName.toLowerCase().includes(query.toLowerCase()) || 
+      u.email.toLowerCase().includes(query.toLowerCase())
+    ).slice(0, 3)
+  };
+  
+  // Show search results in a dropdown
+  showSearchResults(results);
+}
+
+// Show search results
+function showSearchResults(results) {
+  // Implement search results dropdown
+  // This would show a dropdown with matching products, orders, and users
+  console.log('Search results:', results);
+}
+
+// Show order details modal
+function showOrderDetails(orderId) {
+  const order = appState.data.orders.find(o => o.id === orderId);
+  if (!order) return;
+  
+  const modal = document.getElementById('order-details-modal');
+  const content = document.getElementById('order-details-content');
+  
+  // Format order items with prices
+  const orderItems = order.products.map(productName => {
+    const product = appState.data.products.find(p => p.name === productName);
+    return {
+      name: productName,
+      price: product ? product.price : 0,
+      image: product ? product.image : 'https://via.placeholder.com/50x50?text=Product'
+    };
+  });
+  
+  // Calculate subtotal
+  const subtotal = orderItems.reduce((sum, item) => sum + item.price, 0);
+  const shipping = order.total - subtotal;
+  
+  content.innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <h4 class="font-semibold text-gray-800 mb-3">Order Information</h4>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Order ID:</span>
+            <span class="font-medium">${order.id}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Date:</span>
+            <span class="font-medium">${formatDate(order.date, true)}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Status:</span>
+            <span class="font-medium">
+              <span class="px-2 py-1 rounded-full text-xs ${getStatusClasses(order.status)}">
+                ${order.status}
+              </span>
+            </span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Payment Method:</span>
+            <span class="font-medium">${order.paymentMethod}</span>
+          </div>
+        </div>
+        
+        <h4 class="font-semibold text-gray-800 mt-6 mb-3">Customer Information</h4>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Name:</span>
+            <span class="font-medium">${order.customer}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Email:</span>
+            <span class="font-medium">${order.customerEmail}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Shipping Address:</span>
+            <span class="font-medium text-right">${order.shippingAddress}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <h4 class="font-semibold text-gray-800 mb-3">Order Items</h4>
+        <div class="space-y-3 mb-4">
+          ${orderItems.map(item => `
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center gap-3">
+                <img src="${item.image}" alt="${item.name}" class="w-10 h-10 rounded-lg object-cover">
+                <span class="font-medium">${item.name}</span>
+              </div>
+              <span class="font-medium">${formatCurrency(item.price)}</span>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="border-t pt-4">
+          <div class="flex justify-between mb-2">
+            <span class="text-gray-600">Subtotal:</span>
+            <span class="font-medium">${formatCurrency(subtotal)}</span>
+          </div>
+          <div class="flex justify-between mb-2">
+            <span class="text-gray-600">Shipping:</span>
+            <span class="font-medium">${formatCurrency(shipping)}</span>
+          </div>
+          <div class="flex justify-between text-lg font-semibold mt-3 pt-3 border-t">
+            <span>Total:</span>
+            <span>${formatCurrency(order.total)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-6 pt-6 border-t flex justify-end gap-3">
+      <button onclick="printOrder('${order.id}')" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+        <i class="fas fa-print mr-2"></i> Print
+      </button>
+      <button onclick="editOrderStatus('${order.id}')" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+        <i class="fas fa-edit mr-2"></i> Update Status
+      </button>
+    </div>
+  `;
+  
+  modal.classList.remove('hidden');
+}
+
+// Show product details
+function showProductDetails(productId) {
+  const product = appState.data.products.find(p => p.id === productId);
+  if (!product) return;
+  
+  // In a real app, this would open a modal or navigate to a product detail page
+  console.log('Product details:', product);
+}
+
+// Edit product
+function editProduct(productId) {
+  const product = appState.data.products.find(p => p.id === productId);
+  if (!product) return;
+  
+  const modal = document.getElementById('add-product-modal');
+  const form = document.getElementById('add-product-form');
+  
+  // Update modal title
+  document.getElementById('product-modal-title').textContent = 'Edit Product';
+  document.getElementById('product-submit-text').textContent = 'Update Product';
+  
+  // Set form values
+  form.elements.pName.value = product.name;
+  form.elements.pPrice.value = product.price;
+  form.elements.pDescription.value = product.description;
+  form.elements.pCategory.value = product.category;
+  form.elements.pStock.value = product.stock;
+  form.elements.pStatus.value = product.status;
+  form.elements.pSKU.value = product.sku;
+  
+  // Store product ID in form dataset
+  form.dataset.productId = productId;
+  
+  // Open modal
+  modal.classList.remove('hidden');
+}
+
+// Edit category
+function editCategory(categoryId) {
+  const category = appState.data.categories.find(c => c.id === categoryId);
+  if (!category) return;
+  
+  const modal = document.getElementById('add-category-modal');
+  const form = document.getElementById('add-category-form');
+  
+  // Update modal title
+  document.getElementById('category-modal-title').textContent = 'Edit Category';
+  document.getElementById('category-submit-text').textContent = 'Update Category';
+  
+  // Set form values
+  form.elements.cName.value = category.name;
+  form.elements.cDescription.value = category.description;
+  form.elements.cStatus.value = category.status;
+  
+  // Store category ID in form dataset
+  form.dataset.categoryId = categoryId;
+  
+  // Open modal
+  modal.classList.remove('hidden');
+}
+
+// Edit user
+function editUser(userId) {
+  const user = appState.data.users.find(u => u.id === userId);
+  if (!user) return;
+  
+  const modal = document.getElementById('add-user-modal');
+  const form = document.getElementById('add-user-form');
+  
+  // Update modal title
+  document.getElementById('user-modal-title').textContent = 'Edit User';
+  document.getElementById('user-submit-text').textContent = 'Update User';
+  
+  // Set form values
+  form.elements.uFirstName.value = user.firstName;
+  form.elements.uLastName.value = user.lastName;
+  form.elements.uEmail.value = user.email;
+  form.elements.uPhone.value = user.phone;
+  form.elements.uRole.value = user.role;
+  form.elements.uStatus.value = user.status;
+  
+  // Store user ID in form dataset
+  form.dataset.userId = userId;
+  
+  // Open modal
+  modal.classList.remove('hidden');
+}
+
+// Edit order status
+function editOrderStatus(orderId) {
+  const order = appState.data.orders.find(o => o.id === orderId);
+  if (!order) return;
+  
+  // In a real app, this would open a modal to update order status
+  console.log('Edit order status:', orderId);
+}
+
+// Preview AR model
+function previewARModel(modelId) {
+  const model = appState.data.arModels.find(m => m.id === modelId);
+  if (!model) return;
+  
+  // In a real app, this would open an AR preview
+  console.log('Preview AR model:', model);
+}
+
+// Print order
+function printOrder(orderId) {
+  const order = appState.data.orders.find(o => o.id === orderId);
+  if (!order) return;
+  
+  // In a real app, this would open print dialog with order details
+  console.log('Print order:', orderId);
+}
+
+// Confirm delete action
+function confirmDelete(type, id) {
+  const modal = document.getElementById('confirmation-modal');
+  const title = document.getElementById('confirmation-title');
+  const message = document.getElementById('confirmation-message');
+  
+  // Set confirmation message based on type
+  let itemName = '';
+  if (type === 'product') {
+    const product = appState.data.products.find(p => p.id === id);
+    itemName = product ? product.name : 'this product';
+  } else if (type === 'order') {
+    itemName = `order ${id}`;
+  } else if (type === 'user') {
+    const user = appState.data.users.find(u => u.id === id);
+    itemName = user ? `${user.firstName} ${user.lastName}` : 'this user';
+  } else if (type === 'category') {
+    const category = appState.data.categories.find(c => c.id === id);
+    itemName = category ? category.name : 'this category';
+  } else if (type === 'review') {
+    itemName = 'this review';
+  } else if (type === 'ar-model') {
+    const model = appState.data.arModels.find(m => m.id === id);
+    itemName = model ? model.name : 'this AR model';
+  }
+  
+  title.textContent = `Delete ${type.replace('-', ' ')}?`;
+  message.textContent = `Are you sure you want to delete ${itemName}? This action cannot be undone.`;
+  
+  // Set confirm action
+  const confirmBtn = document.getElementById('confirm-action');
+  confirmBtn.onclick = function() {
+    deleteItem(type, id);
+    modal.classList.add('hidden');
+  };
+  
+  // Show modal
+  modal.classList.remove('hidden');
+}
+
+// Delete item function
+function deleteItem(type, id) {
+  if (type === 'product') {
+    appState.data.products = appState.data.products.filter(p => p.id !== id);
+    loadProducts();
+  } else if (type === 'order') {
+    appState.data.orders = appState.data.orders.filter(o => o.id !== id);
+    loadOrders();
+  } else if (type === 'user') {
+    appState.data.users = appState.data.users.filter(u => u.id !== id);
+    loadUsers();
+  } else if (type === 'category') {
+    appState.data.categories = appState.data.categories.filter(c => c.id !== id);
+    loadCategories();
+  } else if (type === 'review') {
+    appState.data.reviews = appState.data.reviews.filter(r => r.id !== id);
+    loadReviews();
+  } else if (type === 'ar-model') {
+    appState.data.arModels = appState.data.arModels.filter(m => m.id !== id);
+    loadARModels();
+  }
+  
+  updateStats();
+}
+
+// Logout function
+function logout() {
+  // In a real app, this would send a logout request to the server
+  console.log('Logging out...');
+  window.location.href = 'login.html';
+}
+
+// Initialize everything on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize sample data
+  initializeSampleData();
+  
+  // Check for dark mode preference
+  const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+  if (savedDarkMode) {
+    toggleDarkMode();
+  }
+  
+  // Set initial section from URL hash
+  const initialSection = window.location.hash.substring(1) || 'dashboard';
+  showSection(initialSection);
+  
+  // Event listeners
+  domElements.menuToggle.addEventListener('click', toggleSidebar);
+  domElements.overlay.addEventListener('click', toggleSidebar);
+  domElements.themeToggle.addEventListener('click', toggleDarkMode);
+  domElements.notificationsBtn.addEventListener('click', toggleNotifications);
+  domElements.profileBtn.addEventListener('click', toggleProfile);
+  
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!domElements.notificationsBtn.contains(e.target) && !domElements.notificationsDropdown.contains(e.target)) {
+      domElements.notificationsDropdown.classList.add('hidden');
+    }
+    if (!domElements.profileBtn.contains(e.target) && !domElements.profileDropdown.contains(e.target)) {
+      domElements.profileDropdown.classList.add('hidden');
+    }
+  });
+  
+  // Global search with debounce
+  domElements.globalSearch.addEventListener('input', debounce(() => {
+    performGlobalSearch(domElements.globalSearch.value);
+  }, 300));
+  
+  // Handle sidebar link clicks
+  domElements.sidebarLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      const target = e.currentTarget.getAttribute('data-target');
+      if (target) showSection(target);
+    });
+  });
+  
+  // Handle modal close buttons
+  document.querySelectorAll('[id$="-modal-btn"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const modalId = btn.id.replace('close-', '').replace('-btn', '-modal');
+      document.getElementById(modalId).classList.add('hidden');
+    });
+  });
+  
+  // Handle cancel buttons in modals
+  document.querySelectorAll('[id^="cancel-"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const modalId = btn.id.replace('cancel-', '').replace('category', 'add-category')
+        .replace('product', 'add-product').replace('user', 'add-user') + '-modal';
+      document.getElementById(modalId).classList.add('hidden');
+    });
+  });
+  
+  // Handle confirmation modal cancel
+  document.getElementById('cancel-confirmation').addEventListener('click', () => {
+    document.getElementById('confirmation-modal').classList.add('hidden');
+  });
+  
+  // Form submissions
+  document.getElementById('add-category-form')?.addEventListener('submit', handleCategoryFormSubmit);
+  document.getElementById('add-product-form')?.addEventListener('submit', handleProductFormSubmit);
+  document.getElementById('add-user-form')?.addEventListener('submit', handleUserFormSubmit);
+  
+  // Filter event listeners
+  document.getElementById('product-category-filter')?.addEventListener('change', (e) => {
+    applyFilter('products', 'category', e.target.value);
+  });
+  
+  document.getElementById('product-status-filter')?.addEventListener('change', (e) => {
+    applyFilter('products', 'status', e.target.value);
+  });
+  
+  document.getElementById('product-search')?.addEventListener('input', debounce((e) => {
+    applyFilter('products', 'search', e.target.value);
+  }, 300));
+  
+  document.getElementById('order-status-filter')?.addEventListener('change', (e) => {
+    applyFilter('orders', 'status', e.target.value);
+  });
+  
+  document.getElementById('order-date-from')?.addEventListener('change', (e) => {
+    applyFilter('orders', 'dateFrom', e.target.value);
+  });
+  
+  document.getElementById('order-date-to')?.addEventListener('change', (e) => {
+    applyFilter('orders', 'dateTo', e.target.value);
+  });
+  
+  document.getElementById('order-search')?.addEventListener('input', debounce((e) => {
+    applyFilter('orders', 'search', e.target.value);
+  }, 300));
+  
+  document.getElementById('user-role-filter')?.addEventListener('change', (e) => {
+    applyFilter('users', 'role', e.target.value);
+  });
+  
+  document.getElementById('user-status-filter')?.addEventListener('change', (e) => {
+    applyFilter('users', 'status', e.target.value);
+  });
+  
+  document.getElementById('user-search')?.addEventListener('input', debounce((e) => {
+    applyFilter('users', 'search', e.target.value);
+  }, 300));
+  
+  document.getElementById('review-rating-filter')?.addEventListener('change', (e) => {
+    applyFilter('reviews', 'rating', e.target.value);
+  });
+  
+  // Chart timeframe selector
+  document.getElementById('chart-timeframe')?.addEventListener('change', () => {
+    updateCharts();
+  });
+  
+  // Refresh charts button
+  document.getElementById('refresh-charts')?.addEventListener('click', () => {
+    updateCharts();
+  });
+  
+  // Refresh stats button
+  document.getElementById('refresh-stats')?.addEventListener('click', () => {
+    updateStats();
+    loadDashboard();
+  });
+  
+  // Handle window resize
+  window.addEventListener('resize', throttle(() => {
+    if (window.innerWidth >= 768 && !domElements.sidebar.classList.contains('-translate-x-full')) {
+      domElements.sidebar.classList.add('-translate-x-full');
+      domElements.overlay.classList.add('hidden');
+      appState.isSidebarOpen = false;
+    }
+  }, 200));
+  
+  // Handle popstate (back/forward navigation)
+  window.addEventListener('popstate', (e) => {
+    if (e.state?.section) {
+      showSection(e.state.section);
+    }
+  });
+});
+
+// Handle category form submission
+function handleCategoryFormSubmit(e) {
+  e.preventDefault();
+  const form = e.target;
+  const isEdit = form.dataset.categoryId;
+  
+  const categoryData = {
+    name: form.elements.cName.value,
+    description: form.elements.cDescription.value,
+    status: form.elements.cStatus.value,
+    image: 'https://via.placeholder.com/100x100?text=Category' // In real app, handle file upload
+  };
+  
+  if (isEdit) {
+    // Update existing category
+    const categoryId = parseInt(form.dataset.categoryId);
+    const index = appState.data.categories.findIndex(c => c.id === categoryId);
+    if (index !== -1) {
+      appState.data.categories[index] = { 
+        ...appState.data.categories[index], 
+        ...categoryData 
+      };
+    }
+  } else {
+    // Add new category
+    const newId = Math.max(...appState.data.categories.map(c => c.id), 0) + 1;
+    appState.data.categories.push({
+      id: newId,
+      productCount: 0,
+      ...categoryData
+    });
+  }
+  
+  // Close modal and refresh categories
+  document.getElementById('add-category-modal').classList.add('hidden');
+  loadCategories();
+}
+
+// Handle product form submission
+function handleProductFormSubmit(e) {
+  e.preventDefault();
+  const form = e.target;
+  const isEdit = form.dataset.productId;
+  
+  const productData = {
+    name: form.elements.pName.value,
+    price: parseFloat(form.elements.pPrice.value),
+    description: form.elements.pDescription.value,
+    category: form.elements.pCategory.value,
+    stock: parseInt(form.elements.pStock.value),
+    status: form.elements.pStatus.value,
+    sku: form.elements.pSKU.value,
+    image: 'https://via.placeholder.com/200x200?text=Product' // In real app, handle file upload
+  };
+  
+  if (isEdit) {
+    // Update existing product
+    const productId = parseInt(form.dataset.productId);
+    const index = appState.data.products.findIndex(p => p.id === productId);
+    if (index !== -1) {
+      appState.data.products[index] = { 
+        ...appState.data.products[index], 
+        ...productData 
+      };
+    }
+  } else {
+    // Add new product
+    const newId = Math.max(...appState.data.products.map(p => p.id), 0) + 1;
+    appState.data.products.push({
+      id: newId,
+      sales: 0,
+      rating: 0,
+      arModel: false,
+      ...productData
+    });
+  }
+  
+  // Close modal and refresh products
+  document.getElementById('add-product-modal').classList.add('hidden');
+  loadProducts();
+  updateStats();
+}
+
+// Handle user form submission
+function handleUserFormSubmit(e) {
+  e.preventDefault();
+  const form = e.target;
+  const isEdit = form.dataset.userId;
+  
+  const userData = {
+    firstName: form.elements.uFirstName.value,
+    lastName: form.elements.uLastName.value,
+    email: form.elements.uEmail.value,
+    phone: form.elements.uPhone.value,
+    role: form.elements.uRole.value,
+    status: form.elements.uStatus.value,
+    joinDate: new Date().toISOString().split('T')[0],
+    totalOrders: 0,
+    totalSpent: 0
+  };
+  
+  if (isEdit) {
+    // Update existing user
+    const userId = parseInt(form.dataset.userId);
+    const index = appState.data.users.findIndex(u => u.id === userId);
+    if (index !== -1) {
+      appState.data.users[index] = { 
+        ...appState.data.users[index], 
+        ...userData 
+      };
+    }
+  } else {
+    // Add new user
+    const newId = Math.max(...appState.data.users.map(u => u.id), 0) + 1;
+    appState.data.users.push({
+      id: newId,
+      ...userData
+    });
+  }
+  
+  // Close modal and refresh users
+  document.getElementById('add-user-modal').classList.add('hidden');
+  loadUsers();
+  updateStats();
+}
+
+// Expose functions to global scope for HTML onclick attributes
+window.showSection = showSection;
+window.showOrderDetails = showOrderDetails;
+window.showProductDetails = showProductDetails;
+window.editProduct = editProduct;
+window.editCategory = editCategory;
+window.editUser = editUser;
+window.editOrderStatus = editOrderStatus;
+window.previewARModel = previewARModel;
+window.printOrder = printOrder;
+window.confirmDelete = confirmDelete;
+window.deleteItem = deleteItem;
+window.logout = logout;
+window.changePage = changePage;
+window.changeItemsPerPage = changeItemsPerPage;
+window.applyFilter = applyFilter;
+window.resetFilters = resetFilters;
+
+</script>
+  </body>
 </html>
