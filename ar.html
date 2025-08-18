@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Furniture Viewer - FurniAR</title>
+    
+    <!-- Model Viewer for AR functionality -->
+    <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .ar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .product-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .product-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .product-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .ar-viewer-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            margin-bottom: 2rem;
+            position: relative;
+            height: 70vh;
+            min-height: 500px;
+        }
+
+        model-viewer {
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+        }
+
+        .ar-instructions {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+
+        .ar-instructions.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .close-instructions {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .controls-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .control-group {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-group h3 {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .control-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .control-btn.active {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+        }
+
+        .ar-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .ar-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ar-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .ar-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .secondary-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .ar-status {
+            text-align: center;
+            margin: 1rem 0;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .ar-status.loading {
+            color: #ffd700;
+        }
+
+        .ar-status.ready {
+            color: #00ff00;
+        }
+
+        .ar-status.error {
+            color: #ff6b6b;
+        }
+
+        .product-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            margin-top: 2rem;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .spec-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .spec-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        .spec-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .loading-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            z-index: 20;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .nav {
+                padding: 0 1rem;
+            }
+            
+            .ar-container {
+                padding: 1rem;
+            }
+            
+            .product-title {
+                font-size: 2rem;
+            }
+            
+            .ar-viewer-container {
+                height: 60vh;
+                min-height: 400px;
+            }
+            
+            .controls-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            .ar-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .ar-btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+
+        /* Hide model-viewer's default AR button */
+        model-viewer::part(default-ar-button) {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">FurniAR</div>
+            <a href="index.html" class="back-btn">← Back to Shop</a>
+        </nav>
+    </header>
+
+    <div class="ar-container">
+        <div class="product-header">
+            <h1 class="product-title" id="productTitle">Loading Product...</h1>
+            <p class="product-subtitle">Experience this furniture in your space with augmented reality</p>
+        </div>
+
+        <div class="ar-status" id="arStatus">Initializing AR viewer...</div>
+
+        <div class="ar-viewer-container">
+            <div class="loading-indicator" id="loadingIndicator">
+                <div class="spinner"></div>
+                <p>Loading 3D model...</p>
+            </div>
+
+            <div class="ar-instructions" id="arInstructions">
+                <button class="close-instructions" onclick="hideInstructions()">×</button>
+                <h4>📱 AR Instructions</h4>
+                <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                    <li>Tap the "View in AR" button below</li>
+                    <li>Point your camera at a flat surface</li>
+                    <li>Move your device to find the surface</li>
+                    <li>Tap to place the furniture</li>
+                    <li>Walk around to see it from different angles</li>
+                </ul>
+                <p><strong>Note:</strong> AR requires a compatible device with camera access</p>
+            </div>
+
+            <model-viewer
+                id="furnitureModel"
+                src=""
+                alt="3D Furniture Model"
+                ar
+                ar-modes="webxr scene-viewer quick-look"
+                camera-controls
+                touch-action="pan-y"
+                auto-rotate
+                auto-rotate-delay="3000"
+                rotation-per-second="30deg"
+                shadow-intensity="1"
+                exposure="1"
+                shadow-softness="0.5"
+                environment-image="neutral"
+                loading="lazy">
+                
+                <div slot="progress-bar">
+                    <div class="loading-indicator">
+                        <div class="spinner"></div>
+                        <p>Loading 3D model...</p>
+                    </div>
+                </div>
+            </model-viewer>
+        </div>
+
+        <div class="controls-panel">
+            <div class="control-group">
+                <h3>🎨 Material Options</h3>
+                <div class="control-buttons" id="materialControls">
+                    <button class="control-btn active" data-material="default">Default</button>
+                    <button class="control-btn" data-material="dark">Dark Wood</button>
+                    <button class="control-btn" data-material="light">Light Wood</button>
+                    <button class="control-btn" data-material="metal">Metal</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>🔄 View Controls</h3>
+                <div class="control-buttons">
+                    <button class="control-btn" onclick="resetView()">Reset View</button>
+                    <button class="control-btn" onclick="toggleAutoRotate()">Auto Rotate</button>
+                    <button class="control-btn" onclick="takeScreenshot()">Screenshot</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>💡 Lighting</h3>
+                <div class="control-buttons" id="lightingControls">
+                    <button class="control-btn active" data-lighting="neutral">Neutral</button>
+                    <button class="control-btn" data-lighting="studio">Studio</button>
+                    <button class="control-btn" data-lighting="outdoor">Outdoor</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="ar-actions">
+            <button class="ar-btn" id="arButton" onclick="activateAR()">
+                <span>📱</span>
+                View in AR
+            </button>
+            <button class="ar-btn secondary-btn" onclick="share3DModel()">
+                <span>📤</span>
+                Share Model
+            </button>
+            <button class="ar-btn secondary-btn" onclick="saveToWishlist()">
+                <span>❤️</span>
+                Save to Wishlist
+            </button>
+        </div>
+
+        <div class="product-info">
+            <h3>Product Specifications</h3>
+            <div class="specs-grid" id="productSpecs">
+                <!-- Product specifications will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Product data configuration
+        const productData = {
+            'sofa': {
+                title: 'Modern 3-Seat Sofa',
+                model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', // Demo model
+                price: '$1,299',
+                dimensions: '84" W × 36" D × 32" H',
+                material: 'Premium Fabric',
+                weight: '120 lbs',
+                color: 'Charcoal Gray'
+            },
+            'table': {
+                title: 'Oak Dining Table',
+                model: 'https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb',
+                price: '$899',
+                dimensions: '72" W × 36" D × 30" H',
+                material: 'Solid Oak',
+                weight: '85 lbs',
+                color: 'Natural Wood'
+            },
+            'chair': {
+                title: 'Leather Armchair',
+                model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
+                price: '$749',
+                dimensions: '32" W × 34" D × 38" H',
+                material: 'Genuine Leather',
+                weight: '45 lbs',
+                color: 'Cognac Brown'
+            },
+            'coffee-table': {
+                title: 'Glass Coffee Table',
+                model: 'https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb',
+                price: '$429',
+                dimensions: '48" W × 24" D × 18" H',
+                material: 'Tempered Glass',
+                weight: '35 lbs',
+                color: 'Clear/Chrome'
+            },
+            'bookshelf': {
+                title: 'Modern Bookshelf',
+                model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
+                price: '$559',
+                dimensions: '32" W × 12" D × 72" H',
+                material: 'Engineered Wood',
+                weight: '65 lbs',
+                color: 'White Oak'
+            },
+            'bed': {
+                title: 'Platform Bed Frame',
+                model: 'https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb',
+                price: '$679',
+                dimensions: '64" W × 84" D × 14" H',
+                material: 'Walnut Veneer',
+                weight: '95 lbs',
+                color: 'Walnut Finish'
+            }
+        };
+
+        let currentProduct = null;
+        let modelViewer = null;
+        let isAutoRotating = true;
+
+        // Initialize the AR viewer
+        function initializeAR() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('product') || 'sofa';
+            
+            currentProduct = productData[productId];
+            if (!currentProduct) {
+                currentProduct = productData['sofa'];
+            }
+
+            // Update page content
+            document.getElementById('productTitle').textContent = currentProduct.title;
+            
+            // Get model viewer element
+            modelViewer = document.getElementById('furnitureModel');
+            
+            // Set the 3D model source
+            modelViewer.src = currentProduct.model;
+            
+            // Update product specifications
+            updateProductSpecs();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            updateStatus('ready', 'AR Ready! Tap "View in AR" to place in your space');
+        }
+
+        function setupEventListeners() {
+            // Model loading events
+            modelViewer.addEventListener('load', () => {
+                document.getElementById('loadingIndicator').style.display = 'none';
+                updateStatus('ready', '✅ 3D model loaded successfully');
+            });
+
+            modelViewer.addEventListener('error', () => {
+                document.getElementById('loadingIndicator').style.display = 'none';
+                updateStatus('error', '❌ Error loading 3D model');
+            });
+
+            // AR events
+            modelViewer.addEventListener('ar-status', (event) => {
+                if (event.detail.status === 'session-started') {
+                    updateStatus('ready', '📱 AR session active');
+                } else if (event.detail.status === 'not-presenting') {
+                    updateStatus('ready', 'AR session ended');
+                }
+            });
+
+            // Material controls
+            document.getElementById('materialControls').addEventListener('click', (e) => {
+                if (e.target.classList.contains('control-btn')) {
+                    // Update active state
+                    document.querySelectorAll('#materialControls .control-btn').forEach(btn => 
+                        btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    
+                    // Apply material (simulated - would require actual material variants)
+                    const material = e.target.dataset.material;
+                    console.log('Changing material to:', material);
+                    updateStatus('ready', `Material changed to ${material}`);
+                }
+            });
+
+            // Lighting controls
+            document.getElementById('lightingControls').addEventListener('click', (e) => {
+                if (e.target.classList.contains('control-btn')) {
+                    // Update active state
+                    document.querySelectorAll('#lightingControls .control-btn').forEach(btn => 
+                        btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    
+                    const lighting = e.target.dataset.lighting;
+                    
+                    // Apply lighting environment
+                    switch(lighting) {
+                        case 'studio':
+                            modelViewer.environmentImage = 'https://modelviewer.dev/shared-assets/environments/music_hall_01_1k.hdr';
+                            modelViewer.exposure = '1.5';
+                            break;
+                        case 'outdoor':
+                            modelViewer.environmentImage = 'https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr';
+                            modelViewer.exposure = '1';
+                            break;
+                        default:
+                            modelViewer.environmentImage = 'neutral';
+                            modelViewer.exposure = '1';
+                    }
+                    
+                    updateStatus('ready', `Lighting changed to ${lighting}`);
+                }
+            });
+        }
+
+        function updateProductSpecs() {
+            const specsContainer = document.getElementById('productSpecs');
+            specsContainer.innerHTML = `
+                <div class="spec-item">
+                    <div class="spec-label">Price</div>
+                    <div class="spec-value">${currentProduct.price}</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Dimensions</div>
+                    <div class="spec-value">${currentProduct.dimensions}</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Material</div>
+                    <div class="spec-value">${currentProduct.material}</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Weight</div>
+                    <div class="spec-value">${currentProduct.weight}</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Color</div>
+                    <div class="spec-value">${currentProduct.color}</div>
+                </div>
+            `;
+        }
+
+        function updateStatus(type, message) {
+            const statusElement = document.getElementById('arStatus');
+            statusElement.className = `ar-status ${type}`;
+            statusElement.textContent = message;
+        }
+
+        function activateAR() {
+            if (modelViewer && modelViewer.canActivateAR) {
+                modelViewer.activateAR();
+                updateStatus('ready', 'Opening AR viewer...');
+            } else {
+                // Fallback for unsupported devices
+                updateStatus('error', 'AR not supported on this device. Try on mobile.');
+                
+                // Show alternative options
+                setTimeout(() => {
+                    updateStatus('ready', 'Use camera controls to explore the 3D model');
+                }, 3000);
+            }
+        }
+
+        function resetView() {
+            if (modelViewer) {
+                modelViewer.resetTurntableRotation();
+                modelViewer.jumpCameraToGoal();
+                updateStatus('ready', 'View reset to default position');
+            }
+        }
+
+        function toggleAutoRotate() {
+            if (modelViewer) {
+                isAutoRotating = !isAutoRotating;
+                if (isAutoRotating) {
+                    modelViewer.setAttribute('auto-rotate', '');
+                    updateStatus('ready', 'Auto-rotation enabled');
+                } else {
+                    modelViewer.removeAttribute('auto-rotate');
+                    updateStatus('ready', 'Auto-rotation disabled');
+                }
+            }
+        }
+
+        function takeScreenshot() {
+            if (modelViewer) {
+                const screenshot = modelViewer.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = `${currentProduct.title.replace(/\s+/g, '_')}_screenshot.png`;
+                link.href = screenshot;
+                link.click();
+                updateStatus('ready', 'Screenshot saved!');
+            }
+        }
+
+        function share3DModel() {
+            if (navigator.share) {
+                navigator.share({
+                    title: currentProduct.title,
+                    text: `Check out this ${currentProduct.title} in 3D and AR!`,
+                    url: window.location.href
+                });
+            } else {
+                // Fallback - copy URL to clipboard
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    updateStatus('ready', 'Link copied to clipboard!');
+                });
+            }
+        }
+
+        function saveToWishlist() {
+            // Simulate saving to wishlist
+            updateStatus('ready', '❤️ Added to wishlist!');
+            
+            // Here you would typically save to user's account or local storage
+            const wishlist = JSON.parse(localStorage.getItem('furniAR_wishlist') || '[]');
+            const productId = new URLSearchParams(window.location.search).get('product');
+            
+            if (!wishlist.includes(productId)) {
+                wishlist.push(productId);
+                localStorage.setItem('furniAR_wishlist', JSON.stringify(wishlist));
+            }
+        }
+
+        function hideInstructions() {
+            document.getElementById('arInstructions').classList.add('hidden');
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeAR);
+
+        // Auto-hide instructions after 10 seconds
+        setTimeout(() => {
+            hideInstructions();
+        }, 10000);
+
+        // Check AR availability
+        if ('xr' in navigator) {
+            navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
+                if (supported) {
+                    updateStatus('ready', 'AR supported! Ready to place furniture');
+                } else {
+                    updateStatus('ready', 'Limited AR support. Use 3D viewer mode');
+                }
+            });
+        } else {
+            updateStatus('ready', '3D model ready. AR requires compatible mobile device');
+        }
+    </script>
+</body>
+</html>
